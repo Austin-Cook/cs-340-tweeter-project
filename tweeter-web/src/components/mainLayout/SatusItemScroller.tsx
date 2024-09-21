@@ -1,9 +1,9 @@
 import InfiniteScroll from "react-infinite-scroll-component";
 import { AuthToken, Status } from "tweeter-shared";
 import StatusItem from "../statusItem/StatusItem";
-import { useContext, useEffect, useState } from "react";
-import { UserInfoContext } from "../userInfo/UserInfoProvider";
+import { useEffect, useState } from "react";
 import useToastListener from "../toaster/ToastListenerHook";
+import useUserInfo from "../userInfo/UserInfoHook";
 
 export const PAGE_SIZE = 10;
 
@@ -29,7 +29,7 @@ const StatusItemScroller = (props: Props) => {
     setNewItems(newItems);
 
   const { displayedUser, authToken } =
-    useContext(UserInfoContext);
+    useUserInfo();
 
   // Initialize the component whenever the displayed user changes
   useEffect(() => {
