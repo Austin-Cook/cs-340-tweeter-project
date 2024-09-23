@@ -1,7 +1,7 @@
-import { AuthToken, User } from "tweeter-shared";
-import { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import UserItem from "../userItem/UserItem";
+import { AuthToken, Status } from "tweeter-shared";
+import StatusItem from "../statusItem/StatusItem";
+import { useEffect, useState } from "react";
 import useToastListener from "../toaster/ToastListenerHook";
 import useUserInfo from "../userInfo/UserInfoHook";
 
@@ -12,23 +12,24 @@ interface Props {
     authToken: AuthToken,
     userAlias: string,
     pageSize: number,
-    lastItem: User | null
-  ) => Promise<[User[], boolean]>;
+    lastItem: Status | null
+  ) => Promise<[Status[], boolean]>;
   itemDescription: string;
 }
 
-const UserItemScroller = (props: Props) => {
+const StatusItemScroller = (props: Props) => {
   const { displayErrorMessage } = useToastListener();
-  const [items, setItems] = useState<User[]>([]);
-  const [newItems, setNewItems] = useState<User[]>([]);
+  const [items, setItems] = useState<Status[]>([]);
+  const [newItems, setNewItems] = useState<Status[]>([]);
   const [hasMoreItems, setHasMoreItems] = useState(true);
-  const [lastItem, setLastItem] = useState<User | null>(null);
+  const [lastItem, setLastItem] = useState<Status | null>(null);
   const [changedDisplayedUser, setChangedDisplayedUser] = useState(true);
 
-  const addItems = (newItems: User[]) =>
+  const addItems = (newItems: Status[]) =>
     setNewItems(newItems);
 
-  const { displayedUser, authToken } = useUserInfo();
+  const { displayedUser, authToken } =
+    useUserInfo();
 
   // Initialize the component whenever the displayed user changes
   useEffect(() => {
@@ -37,14 +38,14 @@ const UserItemScroller = (props: Props) => {
 
   // Load initial items whenever the displayed user changes. Done in a separate useEffect hook so the changes from reset will be visible.
   useEffect(() => {
-    if(changedDisplayedUser) {
+    if (changedDisplayedUser) {
       loadMoreItems();
     }
   }, [changedDisplayedUser]);
 
   // Add new items whenever there are new items to add
   useEffect(() => {
-    if(newItems) {
+    if (newItems) {
       setItems([...items, ...newItems]);
     }
   }, [newItems])
@@ -91,7 +92,7 @@ const UserItemScroller = (props: Props) => {
             key={index}
             className="row mb-3 mx-0 px-0 border rounded bg-white"
           >
-            <UserItem value={item} />
+            <StatusItem value={item} />
           </div>
         ))}
       </InfiniteScroll>
@@ -99,4 +100,4 @@ const UserItemScroller = (props: Props) => {
   );
 };
 
-export default UserItemScroller;
+export default StatusItemScroller;
