@@ -10,16 +10,15 @@ import Login from "./components/authentication/login/Login";
 import Register from "./components/authentication/register/Register";
 import MainLayout from "./components/mainLayout/MainLayout";
 import Toaster from "./components/toaster/Toaster";
-import { AuthToken, FakeData, Status } from "tweeter-shared";
 import UserItemScroller from "./components/mainLayout/UserItemScroller";
 import StatusItemScroller from "./components/mainLayout/SatusItemScroller";
 import useUserInfo from "./components/userInfo/UserInfoHook";
-import { UserItemView } from "./presenter/UserItemPresenter";
-import { FolloweePresenter } from "./presenter/FolloweePresenter";
-import { FollowerPresenter } from "./presenter/FollowerPresenter";
-import { StatusItemView } from "./presenter/StatusItemPresenter";
-import { FeedPresenter } from "./presenter/FeedPresenter";
-import { StoryPresenter } from "./presenter/StoryPresenter";
+import { UserItemView } from "./presenter/mainLayout/UserItemPresenter";
+import { FolloweePresenter } from "./presenter/mainLayout/FolloweePresenter";
+import { FollowerPresenter } from "./presenter/mainLayout/FollowerPresenter";
+import { StatusItemView } from "./presenter/mainLayout/StatusItemPresenter";
+import { FeedPresenter } from "./presenter/mainLayout/FeedPresenter";
+import { StoryPresenter } from "./presenter/mainLayout/StoryPresenter";
 
 const App = () => {
   const { currentUser, authToken } = useUserInfo();

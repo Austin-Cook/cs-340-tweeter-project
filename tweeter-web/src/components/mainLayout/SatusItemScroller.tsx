@@ -4,7 +4,7 @@ import StatusItem from "../statusItem/StatusItem";
 import { useEffect, useState } from "react";
 import useToastListener from "../toaster/ToastListenerHook";
 import useUserInfo from "../userInfo/UserInfoHook";
-import { StatusItemPresenter, StatusItemView } from "../../presenter/StatusItemPresenter";
+import { StatusItemPresenter, StatusItemView } from "../../presenter/mainLayout/StatusItemPresenter";
 
 export const PAGE_SIZE = 10;
 
@@ -39,12 +39,14 @@ const StatusItemScroller = (props: Props) => {
     }
   }, [newItems])
 
+  // concrete observer
   const listener: StatusItemView = {
     addItems: (newItems: Status[]) =>
       setNewItems(newItems),
     displayErrorMessage: displayErrorMessage
   }
 
+  // attach observer to presenter
   const [presenter] = useState(props.presenterGenerator(listener));
 
   const reset = async () => {

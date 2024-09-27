@@ -4,7 +4,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import UserItem from "../userItem/UserItem";
 import useToastListener from "../toaster/ToastListenerHook";
 import useUserInfo from "../userInfo/UserInfoHook";
-import { UserItemPresenter, UserItemView } from "../../presenter/UserItemPresenter";
+import { UserItemPresenter, UserItemView } from "../../presenter/mainLayout/UserItemPresenter";
 
 export const PAGE_SIZE = 10;
 
@@ -39,12 +39,14 @@ const UserItemScroller = (props: Props) => {
     }
   }, [newItems])
 
+  // concrete observer
   const listener: UserItemView = {
     addItems: (newItems: User[]) =>
       setNewItems(newItems),
     displayErrorMessage: displayErrorMessage
   }
 
+  // attach observer to presenter
   const [presenter] = useState(props.presenterGenerator(listener));
 
   const reset = async () => {
