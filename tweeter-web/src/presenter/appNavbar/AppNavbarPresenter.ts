@@ -3,8 +3,8 @@ import { UserService } from "../../model/service/UserService";
 
 export interface AppNavbarView {
   clearUserInfo: () => void;
-  displayInfoMessage: (message: string, duration: number) => void;
-  displayErrorMessage: (message: string) => void;
+  displayInfoMessage: (message: string, duration: number, bootstrapClasses?: string) => void;
+  displayErrorMessage: (message: string, bootstrapClasses?: string) => void;
   clearLastInfoMessage: () => void;
 }
 

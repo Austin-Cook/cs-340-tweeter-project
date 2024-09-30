@@ -2,7 +2,7 @@ import { AuthToken, User } from "tweeter-shared";
 import { UserService } from "../../model/service/UserService";
 
 export interface UserNavigationHookObserver {
-  displayErrorMessage: (message: string) => void;
+  displayErrorMessage: (message: string, bootstrapClasses?: string) => void;
   setDisplayedUser: (user: User) => void;
 }
 

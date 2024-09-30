@@ -3,7 +3,7 @@ import { AuthToken, Status } from "tweeter-shared";
 // observer interface
 export interface StatusItemView {
   addItems: (newItems: Status[]) => void;
-  displayErrorMessage: (message: string) => void;
+  displayErrorMessage: (message: string, bootstrapClasses?: string) => void;
 }
 
 export abstract class StatusItemPresenter {

@@ -5,7 +5,7 @@ export interface LoginView {
   updateUserInfo: (currentUser: User, displayedUser: User | null,
     authToken: AuthToken, remember: boolean) => void;
   navigate: (path: string) => void;
-  displayErrorMessage: (message: string) => void;
+  displayErrorMessage: (message: string, bootstrapClasses?: string) => void;
 }
 
 export class LoginPresenter {

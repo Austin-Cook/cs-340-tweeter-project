@@ -3,8 +3,8 @@ import { UserService } from "../../model/service/UserService";
 import { Dispatch, SetStateAction } from "react";
 
 export interface UserInfoView {
-  displayErrorMessage: (message: string) => void;
-  displayInfoMessage: (message: string, duration: number) => void;
+  displayErrorMessage: (message: string, bootstrapClasses?: string) => void;
+  displayInfoMessage: (message: string, duration: number, bootstrapClasses?: string) => void;
   clearLastInfoMessage: () => void;
   setIsFollower: Dispatch<SetStateAction<boolean>>;
   setFolloweeCount: Dispatch<SetStateAction<number>>;

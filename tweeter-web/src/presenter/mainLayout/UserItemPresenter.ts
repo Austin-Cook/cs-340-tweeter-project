@@ -3,7 +3,7 @@ import { AuthToken, User } from "tweeter-shared";
 // observer interface
 export interface UserItemView {
   addItems: (newItems: User[]) => void;
-  displayErrorMessage: (message: string) => void;
+  displayErrorMessage: (message: string, bootstrapClasses?: string) => void;
 }
 
 export abstract class UserItemPresenter {
