@@ -17,11 +17,14 @@ export class AppNavbarPresenter extends Presenter<AppNavbarView> {
   public async logOut(authToken: AuthToken | null) {
     this.view.displayInfoMessage("Logging Out...", 0);
 
-    this.doFailureReportingOperation(async () => {
-      await this._userService.logout(authToken!);
+    this.doFailureReportingOperation(
+      async () => {
+        await this._userService.logout(authToken!);
 
-      this.view.clearLastInfoMessage();
-      this.view.clearUserInfo();
-    }, "log user out");
+        this.view.clearLastInfoMessage();
+        this.view.clearUserInfo();
+      },
+      "log user out"
+    );
   };
 }

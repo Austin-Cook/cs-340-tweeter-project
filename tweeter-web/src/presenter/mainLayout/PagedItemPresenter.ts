@@ -45,16 +45,19 @@ export abstract class PagedItemPresenter<T, U> extends Presenter<PagedItemView<T
   }
 
   public async loadMoreItems(authToken: AuthToken, userAlias: string) {
-    this.doFailureReportingOperation(async () => {
-      const [newItems, hasMore] = await this.getMoreItems(
-        authToken,
-        userAlias,
-      );
+    this.doFailureReportingOperation(
+      async () => {
+        const [newItems, hasMore] = await this.getMoreItems(
+          authToken,
+          userAlias,
+        );
 
-      this.hasMoreItems = hasMore;
-      this.lastItem = newItems[newItems.length - 1];
-      this.view.addItems(newItems);
-    }, this.getItemDescription());
+        this.hasMoreItems = hasMore;
+        this.lastItem = newItems[newItems.length - 1];
+        this.view.addItems(newItems);
+      },
+      this.getItemDescription()
+    );
   }
 
   protected abstract getMoreItems(authToken: AuthToken, userAlias: string)

@@ -1,8 +1,6 @@
-import { UserService } from "../../../model/service/UserService";
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import { Buffer } from "buffer";
-import { Presenter } from "../../Presenter";
-import { AuthenticationView } from "../login/LoginPresenter";
+import { AuthenticationPresenter, AuthenticationView } from "../AuthenticationPresenter";
 
 export interface RegisterView extends AuthenticationView {
   setImageBytes: Dispatch<SetStateAction<Uint8Array>>
@@ -10,19 +8,7 @@ export interface RegisterView extends AuthenticationView {
   setImageFileExtension: Dispatch<SetStateAction<string>>;
 }
 
-export class RegisterPresenter extends Presenter<RegisterView> {
-  private _userService: UserService;
-  private _isLoading: boolean = false;
-
-  constructor(view: RegisterView) {
-    super(view);
-    this._userService = new UserService();
-  }
-
-  public get isLoading() {
-    return this._isLoading;
-  }
-
+export class RegisterPresenter extends AuthenticationPresenter<RegisterView> {
   public checkSubmitButtonStatus(firstName: string, lastName: string, alias: string,
     password: string, imageUrl: string, imageFileExtension: string): boolean {
     return (
@@ -91,24 +77,20 @@ export class RegisterPresenter extends Presenter<RegisterView> {
   public async doRegister(firstName: string, lastName: string, alias: string,
     password: string, imageBytes: Uint8Array, imageFileExtension: string, rememberMe: boolean)
     : Promise<void> {
-    this.doFailureReportingOperation(async () => {
-      this._isLoading = true;
-
-      const [user, authToken] = await this._userService.register(
-        firstName,
-        lastName,
-        alias,
-        password,
-        imageBytes,
-        imageFileExtension
-      );
-
-      this.view.updateUserInfo(user, user, authToken, rememberMe);
-      this.view.navigate("/");
-    },
-      "register user"),
-      () => {
-        this._isLoading = false;
-      };
+    this.doAuthentication(
+      async () => {
+        return this.userService.register(
+          firstName,
+          lastName,
+          alias,
+          password,
+          imageBytes,
+          imageFileExtension
+        );
+      },
+      () => this.view.navigate("/"),
+      rememberMe,
+      "register user"
+    );
   };
 }

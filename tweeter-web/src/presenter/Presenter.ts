@@ -18,8 +18,11 @@ export class Presenter<V extends View> {
     return this._view;
   }
 
-  protected async doFailureReportingOperation(operation: () => Promise<void>,
-    operationDescription: string, doFinally?: () => void): Promise<void> {
+  protected async doFailureReportingOperation(
+    operation: () => Promise<void>,
+    operationDescription: string,
+    doFinally?: () => void
+  ): Promise<void> {
     try {
       await operation();
     } catch (error) {
