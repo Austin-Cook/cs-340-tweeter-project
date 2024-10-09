@@ -1,25 +1,21 @@
-import { User, AuthToken } from "tweeter-shared";
 import { UserService } from "../../../model/service/UserService";
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import { Buffer } from "buffer";
+import { Presenter } from "../../Presenter";
+import { AuthenticationView } from "../login/LoginPresenter";
 
-export interface RegisterView {
-  navigate: (path: string) => void;
-  updateUserInfo: (currentUser: User, displayedUser: User | null,
-    authToken: AuthToken, remember: boolean) => void;
-  displayErrorMessage: (message: string, bootstrapClasses?: string) => void;
+export interface RegisterView extends AuthenticationView {
   setImageBytes: Dispatch<SetStateAction<Uint8Array>>
   setImageUrl: Dispatch<SetStateAction<string>>
   setImageFileExtension: Dispatch<SetStateAction<string>>;
 }
 
-export class RegisterPresenter {
-  private _view: RegisterView;
+export class RegisterPresenter extends Presenter<RegisterView> {
   private _userService: UserService;
   private _isLoading: boolean = false;
 
   constructor(view: RegisterView) {
-    this._view = view;
+    super(view);
     this._userService = new UserService();
   }
 
@@ -58,7 +54,7 @@ export class RegisterPresenter {
   private handleImageFile(file: File | undefined, imageBytes: Uint8Array, imageUrl: string,
     imageFileExtension: string): void {
     if (file) {
-      this._view.setImageUrl(URL.createObjectURL(file));
+      this.view.setImageUrl(URL.createObjectURL(file));
 
       const reader = new FileReader();
       reader.onload = (event: ProgressEvent<FileReader>) => {
@@ -73,18 +69,18 @@ export class RegisterPresenter {
           "base64"
         );
 
-        this._view.setImageBytes(bytes);
+        this.view.setImageBytes(bytes);
       };
       reader.readAsDataURL(file);
 
       // Set image file extension (and move to a separate method)
       const fileExtension = this.getFileExtension(file);
       if (fileExtension) {
-        this._view.setImageFileExtension(fileExtension);
+        this.view.setImageFileExtension(fileExtension);
       }
     } else {
-      this._view.setImageUrl("");
-      this._view.setImageBytes(new Uint8Array());
+      this.view.setImageUrl("");
+      this.view.setImageBytes(new Uint8Array());
     }
   };
 
@@ -95,7 +91,7 @@ export class RegisterPresenter {
   public async doRegister(firstName: string, lastName: string, alias: string,
     password: string, imageBytes: Uint8Array, imageFileExtension: string, rememberMe: boolean)
     : Promise<void> {
-    try {
+    this.doFailureReportingOperation(async () => {
       this._isLoading = true;
 
       const [user, authToken] = await this._userService.register(
@@ -107,14 +103,12 @@ export class RegisterPresenter {
         imageFileExtension
       );
 
-      this._view.updateUserInfo(user, user, authToken, rememberMe);
-      this._view.navigate("/");
-    } catch (error) {
-      this._view.displayErrorMessage(
-        `Failed to register user because of exception: ${error}`
-      );
-    } finally {
-      this._isLoading = false;
-    }
+      this.view.updateUserInfo(user, user, authToken, rememberMe);
+      this.view.navigate("/");
+    },
+      "register user"),
+      () => {
+        this._isLoading = false;
+      };
   };
 }

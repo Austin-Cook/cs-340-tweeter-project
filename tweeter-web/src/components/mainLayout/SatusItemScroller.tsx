@@ -39,14 +39,12 @@ const StatusItemScroller = (props: Props) => {
     }
   }, [newItems])
 
-  // concrete observer
   const listener: StatusItemView = {
     addItems: (newItems: Status[]) =>
       setNewItems(newItems),
     displayErrorMessage: displayErrorMessage
   }
 
-  // attach observer to presenter
   const [presenter] = useState(props.presenterGenerator(listener));
 
   const reset = async () => {
