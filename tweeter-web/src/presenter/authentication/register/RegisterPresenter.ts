@@ -12,10 +12,9 @@ export class RegisterPresenter extends AuthenticationPresenter<RegisterView> {
   public checkSubmitButtonStatus(firstName: string, lastName: string, alias: string,
     password: string, imageUrl: string, imageFileExtension: string): boolean {
     return (
+      this.hasEmptyCommonField(alias, password) ||
       !firstName ||
       !lastName ||
-      !alias ||
-      !password ||
       !imageUrl ||
       !imageFileExtension
     );
@@ -24,7 +23,7 @@ export class RegisterPresenter extends AuthenticationPresenter<RegisterView> {
   public registerOnEnter(event: React.KeyboardEvent<HTMLElement>, firstName: string,
     lastName: string, alias: string, password: string, imageBytes: Uint8Array, imageUrl: string,
     imageFileExtension: string, rememberMe: boolean) {
-    if (event.key == "Enter" && !this.checkSubmitButtonStatus(firstName, lastName, alias, password,
+    if (event.key == "Enter" && this.checkSubmitButtonStatus(firstName, lastName, alias, password,
       imageUrl, imageFileExtension)) {
       this.doRegister(firstName, lastName, alias, password, imageBytes, imageFileExtension,
         rememberMe);

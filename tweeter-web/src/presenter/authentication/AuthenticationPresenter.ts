@@ -25,6 +25,10 @@ export class AuthenticationPresenter<T extends AuthenticationView> extends Prese
     return this._isLoading;
   }
 
+  protected hasEmptyCommonField(alias: string, password: string) {
+    return !alias || !password;
+  }
+
   protected async doAuthentication(
     authenticate: () => Promise<[User, AuthToken]>,
     navigate: () => void,

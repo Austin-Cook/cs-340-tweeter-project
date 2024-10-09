@@ -2,7 +2,7 @@ import { AuthenticationPresenter, AuthenticationView } from "../AuthenticationPr
 
 export class LoginPresenter extends AuthenticationPresenter<AuthenticationView> {
   public checkSubmitButtonStatus(alias: string, password: string): boolean {
-    return !alias || !password;
+    return this.hasEmptyCommonField(alias, password);
   };
 
   public async doLogin(alias: string, password: string, rememberMe: boolean, originalUrl?: string)
