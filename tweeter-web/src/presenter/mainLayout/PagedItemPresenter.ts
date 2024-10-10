@@ -39,6 +39,10 @@ export abstract class PagedItemPresenter<T, U> extends Presenter<PagedItemView<T
     this._lastItem = value;
   }
 
+  protected abstract getMoreItems(authToken: AuthToken, userAlias: string)
+    : Promise<[T[], boolean]>;
+  protected abstract getItemDescription(): string;
+
   public reset() {
     this._lastItem = null;
     this._hasMoreItems = true;
@@ -59,9 +63,4 @@ export abstract class PagedItemPresenter<T, U> extends Presenter<PagedItemView<T
       this.getItemDescription()
     );
   }
-
-  protected abstract getMoreItems(authToken: AuthToken, userAlias: string)
-    : Promise<[T[], boolean]>;
-
-  protected abstract getItemDescription(): string;
 }
