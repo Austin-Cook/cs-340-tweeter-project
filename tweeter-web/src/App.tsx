@@ -20,10 +20,8 @@ import { AppPresenter } from "./presenter/AppPresenter";
 import { PagedItemView } from "./presenter/mainLayout/PagedItemPresenter";
 import { Status, User } from "tweeter-shared";
 import ItemScroller from "./components/mainLayout/ItemScroller";
-import UserItem, { userItemGenerator } from "./components/userItem/UserItem";
-import { StatusService } from "./model/service/StatusService";
-import StatusItem, { statusItemGenerator } from "./components/statusItem/StatusItem";
-import { FollowService } from "./model/service/FollowService";
+import { userItemGenerator } from "./components/itemBox/UserItem";
+import { statusItemGenerator } from "./components/itemBox/StatusItem";
 
 const App = () => {
   const { currentUser, authToken } = useUserInfo();
