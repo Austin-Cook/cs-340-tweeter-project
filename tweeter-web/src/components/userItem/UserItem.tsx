@@ -2,6 +2,8 @@ import { User } from "tweeter-shared";
 import { Link } from "react-router-dom";
 import useUserNavigation from "../userNavigation/UserNavigationHook";
 
+export const userItemGenerator = (item: User) => <UserItem value={item} />;
+
 interface Props {
   value: User;
 }

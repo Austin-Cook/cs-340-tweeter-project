@@ -3,6 +3,8 @@ import Post from "../statusItem/Post";
 import { Status } from "tweeter-shared";
 import useUserNavigation from "../userNavigation/UserNavigationHook";
 
+export const statusItemGenerator = (item: Status) => <StatusItem value={item} />;
+
 interface Props {
   value: Status;
 }
