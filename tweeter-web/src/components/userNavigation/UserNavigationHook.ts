@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import useToastListener from "../toaster/ToastListenerHook";
 import useUserInfo from "../userInfo/UserInfoHook";
-import { UserNavigationHookObserver, UserNavigationHookPresenter } from "../../presenter/userNavigation/UserNavigationHookPresenter";
+import { UserNavigationHookView, UserNavigationHookPresenter } from "../../presenter/userNavigation/UserNavigationHookPresenter";
 
 interface UserNavigation {
   navigateToUser: (event: React.MouseEvent) => Promise<void>;
@@ -12,7 +12,7 @@ const useUserNavigation = (): UserNavigation => {
   const { setDisplayedUser, currentUser, authToken } =
     useUserInfo();
 
-  const listener: UserNavigationHookObserver = {
+  const listener: UserNavigationHookView = {
     displayErrorMessage: displayErrorMessage,
     setDisplayedUser: setDisplayedUser
   }
