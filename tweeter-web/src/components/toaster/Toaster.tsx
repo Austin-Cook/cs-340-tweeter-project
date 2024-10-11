@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 import { Toast } from "react-bootstrap";
 import useToaster from "./ToastHook";
 import { ToasterPresenter, ToasterView } from "../../presenter/toaster/ToasterPresenter";
+import useToastListener from "./ToastListenerHook";
 
 interface Props {
   position: string;
 }
 
 const Toaster = ({ position }: Props) => {
+  const { displayErrorMessage } = useToastListener();
   const { toastList, deleteToast } = useToaster();
 
   useEffect(() => {
@@ -19,6 +21,7 @@ const Toaster = ({ position }: Props) => {
   }, [toastList]);
 
   const listener: ToasterView = {
+    displayErrorMessage: displayErrorMessage,
     deleteToast: deleteToast
   }
 
