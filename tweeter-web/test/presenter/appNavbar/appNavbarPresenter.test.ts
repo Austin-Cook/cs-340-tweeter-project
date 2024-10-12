@@ -15,15 +15,15 @@ describe("AppNavbarPresenter", () => {
 
   beforeEach(() => {
     mockAppNavbarView = mock<AppNavbarView>();
-    const mockAppNavbarViewInstance = instance(mockAppNavbarView);
+    const AppNavbarView = instance(mockAppNavbarView);
 
-    const appNavbarPresenterSpy = spy(new AppNavbarPresenter(mockAppNavbarViewInstance))
-    appNavbarPresenter = instance(appNavbarPresenterSpy);
+    const spyAppNavbarPresenter = spy(new AppNavbarPresenter(AppNavbarView))
+    appNavbarPresenter = instance(spyAppNavbarPresenter);
 
     mockUserService = mock<UserService>();
-    const mockUserServiceInstance = instance(mockUserService);
+    const userService = instance(mockUserService);
 
-    when(appNavbarPresenterSpy.userService).thenReturn(mockUserServiceInstance);
+    when(spyAppNavbarPresenter.userService).thenReturn(userService);
   });
 
   const throwErrorOnServiceLogout = () => {
