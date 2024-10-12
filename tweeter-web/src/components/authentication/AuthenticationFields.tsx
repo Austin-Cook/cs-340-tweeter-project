@@ -19,6 +19,7 @@ const AuthenticationFields = (props: Props) => {
           className="form-control"
           size={50}
           id="aliasInput"
+          aria-label="alias"
           placeholder="name@example.com"
           onKeyDown={(event) => presenter.onEnter(event, props.onEnter,
             props.checkSubmitButtonStatus)}
@@ -31,6 +32,7 @@ const AuthenticationFields = (props: Props) => {
           type="password"
           className="form-control bottom"
           id="passwordInput"
+          aria-label="password"
           placeholder="Password"
           onKeyDown={(event) => presenter.onEnter(event, props.onEnter,
             props.checkSubmitButtonStatus)}
