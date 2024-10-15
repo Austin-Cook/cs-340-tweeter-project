@@ -4,7 +4,7 @@ import React from "react";
 import { AuthToken, User } from "tweeter-shared";
 import { StatusService } from "../../../src/model/service/StatusService";
 
-describe("postStatusPresenter", () => {
+describe("PostStatusPresenter", () => {
   let mockPostStatusView: PostStatusView;
   let mockStatusService: StatusService;
   let postStatusPresenter: PostStatusPresenter;

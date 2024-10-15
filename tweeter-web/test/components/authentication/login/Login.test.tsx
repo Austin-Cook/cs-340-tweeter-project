@@ -1,15 +1,14 @@
 import React from "react";
 import { MemoryRouter } from "react-router-dom";
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent, { UserEvent } from "@testing-library/user-event";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import Login from "../../../../src/components/authentication/login/Login";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fab } from "@fortawesome/free-brands-svg-icons";
 import { LoginPresenter } from "../../../../src/presenter/authentication/login/LoginPresenter";
-import { anything, instance, mock, spy, verify } from "ts-mockito";
+import { instance, mock, spy, verify } from "ts-mockito";
 import { AuthenticationView } from "../../../../src/presenter/authentication/AuthenticationPresenter";
-
 
 library.add(fab);
 
@@ -54,7 +53,7 @@ describe("Login Component", () => {
       const mockAuthenticationView = mock<AuthenticationView>();
       const authenticationView = instance(mockAuthenticationView);
 
-      // spying is necessary if not mocking checkSubmitButtonStatus()
+      // spying is necessary because checkSubmitButtonStatus() is needed
       const spyLoginPresenter = spy(new LoginPresenter(authenticationView));
       const loginPresenter = instance(spyLoginPresenter);
 
