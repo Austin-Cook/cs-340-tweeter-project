@@ -28,7 +28,7 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
     currentUser: User,
     displayedUser: User
   ) {
-    this.doFailureReportingOperation(
+    await this.doFailureReportingOperation(
       async () => {
         if (currentUser === displayedUser) {
           this.view.setIsFollower(false);
@@ -46,7 +46,7 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
     authToken: AuthToken,
     displayedUser: User
   ) {
-    this.doFailureReportingOperation(
+    await this.doFailureReportingOperation(
       async () => {
         this.view.setFolloweeCount(await this._userService.getFolloweeCount(authToken, displayedUser));
       },
@@ -58,7 +58,7 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
     authToken: AuthToken,
     displayedUser: User
   ) {
-    this.doFailureReportingOperation(
+    await this.doFailureReportingOperation(
       async () => {
         this.view.setFollowerCount(await this._userService.getFollowerCount(authToken, displayedUser));
       },
@@ -76,7 +76,7 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
   ): Promise<void> {
     event.preventDefault();
 
-    this.doFailureReportingOperation(
+    await this.doFailureReportingOperation(
       async () => {
         this.view.setIsLoading(true);
         this.view.displayInfoMessage(`Following ${displayedUser!.name}...`, 0);
@@ -90,12 +90,10 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
         this.view.setFollowerCount(followerCount);
         this.view.setFolloweeCount(followeeCount);
       },
-      "follow user",
-      () => {
-        this.view.clearLastInfoMessage();
-        this.view.setIsLoading(false);
-      }
+      "follow user"
     );
+    this.view.clearLastInfoMessage();
+    this.view.setIsLoading(false);
   };
 
   public async unfollowDisplayedUser(
@@ -103,7 +101,7 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
   ): Promise<void> {
     event.preventDefault();
 
-    this.doFailureReportingOperation(
+    await this.doFailureReportingOperation(
       async () => {
         this.view.setIsLoading(true);
         this.view.displayInfoMessage(
@@ -120,11 +118,9 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
         this.view.setFollowerCount(followerCount);
         this.view.setFolloweeCount(followeeCount);
       },
-      "unfollow user",
-      () => {
-        this.view.clearLastInfoMessage();
-        this.view.setIsLoading(false);
-      }
+      "unfollow user"
     );
+    this.view.clearLastInfoMessage();
+    this.view.setIsLoading(false);
   };
 }

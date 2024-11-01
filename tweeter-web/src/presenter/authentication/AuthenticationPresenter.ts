@@ -35,7 +35,7 @@ export class AuthenticationPresenter<T extends AuthenticationView> extends Prese
     rememberMe: boolean,
     operationDescription: string
   ): Promise<void> {
-    this.doFailureReportingOperation(
+    await this.doFailureReportingOperation(
       async () => {
         this._isLoading = true;
 
@@ -45,10 +45,8 @@ export class AuthenticationPresenter<T extends AuthenticationView> extends Prese
 
         navigate();
       },
-      operationDescription,
-      () => {
-        this._isLoading = false;
-      }
+      operationDescription
     );
+    this._isLoading = false;
   }
 }
