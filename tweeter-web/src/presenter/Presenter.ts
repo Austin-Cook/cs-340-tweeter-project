@@ -21,18 +21,13 @@ export class Presenter<V extends View> {
   protected async doFailureReportingOperation(
     operation: () => Promise<void>,
     operationDescription: string,
-    doFinally?: () => void
   ): Promise<void> {
     try {
       await operation();
     } catch (error) {
       this._view.displayErrorMessage(
-        `Failed to ${operationDescription} because of exception: ${error}`
+        `Failed to ${operationDescription} because of exception: ${(error as Error).message}`
       );
-    } finally {
-      if (doFinally) {
-        doFinally();
-      }
     }
   }
 }
