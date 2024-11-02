@@ -24,3 +24,19 @@ Rebuild either module of the project (tweeter-shared or tweeter-web) by running 
 ## Running the Project
 
 Run the project by running 'npm start' from within the 'tweeter-web' folder.
+
+## Update Lambda Layer (dependencies for lambda functions i.e. tweeter-server dependencies)
+This contains the dependencies needed for the lambdas
+
+1) Move into `tweeter-server`
+2) Run `./updateNodejsZip.sh`
+3) In the AWS console, find the layer under layers
+4) Click to create a new version and upload the `nodejs.zip` created in step 2
+5) Return to `tweeter-server` and update `LAMBDALAYER_ARN` in the `.server` file with the new arn
+6) Run `./updateLayers` to attatch the new layer to the Lambdas deployed to the cloud
+
+## Update Lambda Functions
+
+1) Move into `tweeter-server`
+2) Run `./updateDistZip.sh` (creates a zip of dist which contains the lambdas to be uploaded to the cloud)
+3) Run `./updateLambdas.sh` (creates the lambdas in the cloud)
