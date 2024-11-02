@@ -38,8 +38,10 @@ export type { PagedStatusItemResponse } from "./model/net/response/PagedStatusIt
 export type { GetUserResponse } from "./model/net/response/GetUserResponse"
 export type { LoginRegisterResponse } from "./model/net/response/LoginRegisterResponse"
 export type { GetIsFollowerStatusResponse } from "./model/net/response/GetIsFollowerStatusResponse"
-export type { GetFollowCountResponse } from "./model/net/response/GetFollowCountResponse"
+export type { GetFolloweeCountResponse } from "./model/net/response/GetFolloweeCountResponse"
+export type { GetFollowerCountResponse } from "./model/net/response/GetFollowerCountResponse"
 export type { FollowUnfollowResponse } from "./model/net/response/FollowUnfollowResponse"
+export type { TweeterResponse } from "./model/net/response/TweeterResponse"
 
 //
 // Other
