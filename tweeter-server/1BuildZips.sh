@@ -14,7 +14,3 @@ npm run build
 # create zips for dist (lambdas) and nodejs (lambda layer of dependencies)
 ./updateDistZip.sh
 ./updateNodejsZip.sh
-
-# upload lambdas to cloud and uploat and attach new layer
-./uploadLambdas.sh
-./updateLayers.sh
