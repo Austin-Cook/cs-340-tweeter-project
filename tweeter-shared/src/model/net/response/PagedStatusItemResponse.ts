@@ -1,7 +1,6 @@
 import { StatusDto } from "../../dto/StatusDto";
-import { TweeterResponse } from "./TweeterResponse";
+import { PagedItemResponse } from "./PagedItemResponse";
 
-export interface PagedStatusItemResponse extends TweeterResponse {
+export interface PagedStatusItemResponse extends PagedItemResponse {
   readonly items: StatusDto[] | null;
-  readonly hasMore: boolean;
 }

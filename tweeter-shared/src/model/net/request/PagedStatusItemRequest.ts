@@ -1,8 +1,6 @@
 import { StatusDto } from "../../dto/StatusDto";
+import { PagedItemRequest } from "./PagedItemRequest";
 
-export interface PagedStatusItemRequest {
-  readonly token: string,
-  readonly userAlias: string,
-  readonly pageSize: number,
-  readonly lastItem: StatusDto | null
+export interface PagedStatusItemRequest extends PagedItemRequest {
+  readonly lastItem: StatusDto | null;
 }

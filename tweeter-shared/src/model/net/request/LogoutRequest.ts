@@ -1,3 +1,4 @@
-export interface LogoutRequest {
-  readonly token: string
+import { AuthenticatedRequest } from "./AuthenticatedRequest";
+
+export interface LogoutRequest extends AuthenticatedRequest {
 }

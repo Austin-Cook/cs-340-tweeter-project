@@ -32,7 +32,7 @@ This contains the dependencies needed for the lambdas
 2) Run `./updateNodejsZip.sh`
 3) In the AWS console, find the layer under layers
 4) Click to create a new version and upload the `nodejs.zip` created in step 2
-5) Return to `tweeter-server` and update `LAMBDALAYER_ARN` in the `.server` file with the new arn
+5) Return to `tweeter-server` and update `LAMBDALAYER_ARN` in the `.server` file with the new arn. Select Node.js 20.x as the runtime.
 6) Run `./updateLayers` to attatch the new layer to the Lambdas deployed to the cloud
 
 ## Update Lambda Functions

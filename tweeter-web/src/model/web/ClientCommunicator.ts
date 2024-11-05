@@ -28,7 +28,7 @@ export class ClientCommunicator {
       headers,
       req ? JSON.stringify(req) : req
     );
-    
+
     console.log(`Fetching '${url}' with params '${JSON.stringify(params)}'`);
 
     try {
@@ -45,8 +45,7 @@ export class ClientCommunicator {
     } catch (error) {
       console.error(error);
       throw new Error(
-        `Client communicator ${params.method} failed:\n${
-          (error as Error).message
+        `Client communicator ${params.method} failed:\n${(error as Error).message
         }`
       );
     }
