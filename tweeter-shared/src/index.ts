@@ -20,6 +20,7 @@ export type { AuthTokenDto } from "./model/dto/AuthTokenDto"
 //
 // Requests
 //
+export type { TweeterRequest } from "./model/net/request/TweeterRequest"
 export type { PagedUserItemRequest } from "./model/net/request/PagedUserItemRequest";
 export type { PagedStatusItemRequest } from "./model/net/request/PagedStatusItemRequest";
 export type { PostStatusRequest } from "./model/net/request/PostStatusRequest";

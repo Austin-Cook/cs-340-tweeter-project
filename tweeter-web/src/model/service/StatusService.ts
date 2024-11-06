@@ -1,4 +1,5 @@
-import { AuthToken, Status, FakeData } from "tweeter-shared";
+import { AuthToken, Status } from "tweeter-shared";
+import { ServerFacade } from "../web/ServerFacade";
 
 export class StatusService {
   public async loadMoreFeedItems(
@@ -7,8 +8,12 @@ export class StatusService {
     pageSize: number,
     lastItem: Status | null
   ): Promise<[Status[], boolean]> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+    return ServerFacade.instance.loadMoreFeedItems_Server({
+      token: authToken.token,
+      userAlias: userAlias,
+      pageSize: pageSize,
+      lastItem: lastItem == null ? null : lastItem.dto
+    });
   };
 
   public async loadMoreStoryItems(
@@ -17,8 +22,20 @@ export class StatusService {
     pageSize: number,
     lastItem: Status | null
   ): Promise<[Status[], boolean]> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+    console.log("\n\nStory request:")
+    console.log({
+      token: authToken.token,
+      userAlias: userAlias,
+      pageSize: pageSize,
+      lastItem: lastItem == null ? null : lastItem.dto
+    })
+    console.log()
+    return ServerFacade.instance.loadMoreStoryItems_Server({
+      token: authToken.token,
+      userAlias: userAlias,
+      pageSize: pageSize,
+      lastItem: lastItem == null ? null : lastItem.dto
+    });
   };
 
   public async postStatus(
