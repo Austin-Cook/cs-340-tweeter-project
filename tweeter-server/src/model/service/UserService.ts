@@ -6,27 +6,30 @@ export class UserService {
     token: string,
     alias: string
   ): Promise<UserDto | null> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.findUserByAlias(alias);
+    const user = FakeData.instance.findUserByAlias(alias);
+    const userDto: UserDto | null = user == null ? null : user.dto;
+
+    return userDto;
   };
 
   public async login(
     alias: string,
     password: string
   ): Promise<[UserDto, AuthTokenDto]> {
-    // TODO: Replace with the result of calling the server
     const user = FakeData.instance.firstUser;
 
     if (user === null) {
       throw new Error("Invalid alias or password");
     }
 
-    return [user, FakeData.instance.authToken];
+    return [user.dto, FakeData.instance.authToken.dto];
   };
 
   public async logout(token: string): Promise<void> {
     // Pause so we can see the logging out message. Delete when the call to the server is implemented.
     await new Promise((res) => setTimeout(res, 1000));
+
+    // TODO: Log the user out
   };
 
   public async register(
@@ -49,7 +52,7 @@ export class UserService {
       throw new Error("Invalid registration");
     }
 
-    return [user, FakeData.instance.authToken];
+    return [user.dto, FakeData.instance.authToken.dto];
   };
 
   public async getIsFollowerStatus(

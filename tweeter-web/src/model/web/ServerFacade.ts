@@ -1,10 +1,18 @@
 import {
+  AuthToken,
+  GetUserRequest,
+  GetUserResponse,
+  LoginRegisterResponse,
+  LoginRequest,
+  LogoutRequest,
   PagedStatusItemRequest,
   PagedStatusItemResponse,
   PagedUserItemRequest,
   PagedUserItemResponse,
   PostStatusRequest,
   Status,
+  TweeterRequest,
+  TweeterResponse,
   User
 } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
@@ -68,7 +76,86 @@ export class ServerFacade {
   public async postStatus_Server(
     request: PostStatusRequest
   ): Promise<void> {
+    const response = await this.clientCommunicator.doPost<
+      PostStatusRequest,
+      TweeterResponse
+    >(request, "/status/post");
 
+    // Handle errors
+    if (!response.success) {
+      console.error(response);
+      throw new Error(response.message!);
+    }
+  }
+
+  public async getUser_Server(
+    request: GetUserRequest
+  ): Promise<User | null> {
+    const response = await this.clientCommunicator.doPost<
+      GetUserRequest,
+      GetUserResponse
+    >(request, "/user/get");
+
+    const user: User | null = response.success && response.user
+      ? User.fromDto(response.user)
+      : null;
+
+    // Handle errors
+    if (response.success) {
+      if (user == null) {
+        throw new Error(`No user found`);
+      } else {
+        return user;
+      }
+    } else {
+      console.error(response);
+      throw new Error(response.message!);
+    }
+  }
+
+  public async login_Server(
+    request: LoginRequest
+  ): Promise<[User, AuthToken]> {
+    const response = await this.clientCommunicator.doPost<
+      LoginRequest,
+      LoginRegisterResponse
+    >(request, "/user/login");
+
+    const user: User | null = response.success && response.user
+      ? User.fromDto(response.user)
+      : null;
+    const authToken: AuthToken | null = response.success && response.authToken
+      ? AuthToken.fromDto(response.authToken)
+      : null;
+
+    // Handle errors
+    if (response.success) {
+      if (user == null) {
+        throw new Error(`No user found`);
+      } else if (authToken == null) {
+        throw new Error('No authToken found');
+      } else {
+        return [user, authToken];
+      }
+    } else {
+      console.error(response);
+      throw new Error(response.message!);
+    }
+  }
+
+  public async logout_server(
+    request: LogoutRequest
+  ): Promise<void> {
+    const response = await this.clientCommunicator.doPost<
+      LogoutRequest,
+      TweeterResponse
+    >(request, "/user/logout");
+
+    // Handle errors
+    if (!response.success) {
+      console.error(response);
+      throw new Error(response.message!);
+    }
   }
 
   private async getMorePagedItems<T, REQ extends PagedItemRequest, RES extends PagedItemResponse>(
@@ -81,10 +168,11 @@ export class ServerFacade {
       REQ,
       RES
     >(request, endpoint);
+
     // Convert the UserDto array returned by ClientCommunicator to a User array
     const items: T[] | null = extractItemsFromResponse(response);
 
-    // Handle errors    
+    // Handle errors
     if (response.success) {
       if (items == null) {
         throw new Error(`No ${itemName} found`);

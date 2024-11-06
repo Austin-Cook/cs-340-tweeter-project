@@ -12,7 +12,6 @@ export const handler = async (request: PagedUserItemRequest): Promise<PagedUserI
     return getMissingUserFieldResponse<PagedUserItemResponse>();
   }
 
-
   const getItems = async (): Promise<[UserDto[], boolean]> => {
     return await new FollowService().loadMoreFollowers(request.token, request.userAlias, request.pageSize, request.lastItem);
   }
