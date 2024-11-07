@@ -13,7 +13,7 @@ const ItemScroller = <T, U extends PagedItemPresenter<T, V>, V>(props: Props<T, 
   const { displayErrorMessage } = useToastListener();
   const [items, setItems] = useState<T[]>([]);
   const [newItems, setNewItems] = useState<T[]>([]);
-  const [changedDisplayedUser, setChangedDisplayedUser] = useState(true);
+  const [changedDisplayedUser, setChangedDisplayedUser] = useState(false);
 
   const { displayedUser, authToken } = useUserInfo();
 
