@@ -1,4 +1,5 @@
 import { TweeterRequest, TweeterResponse } from "tweeter-shared";
+import "isomorphic-fetch";
 
 export class ClientCommunicator {
   private SERVER_URL: string;
@@ -37,11 +38,9 @@ export class ClientCommunicator {
       if (resp.ok) {
         // Be careful with the return type here. resp.json() returns Promise<any> which means there is no type checking on response.
         const response: RES = await resp.json();
-        console.log(`OK: Response: '${JSON.stringify(response)}'`); // DELETEME
         return response;
       } else {
         const error = await resp.json();
-        console.log(`ERROR: Response: '${JSON.stringify(error)}'`); // DELETEME
         throw new Error(error.errorMessage);
       }
     } catch (error) {

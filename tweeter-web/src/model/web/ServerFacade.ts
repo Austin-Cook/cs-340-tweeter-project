@@ -1,5 +1,10 @@
 import {
   AuthToken,
+  FollowUnfollowResponse,
+  GetFolloweeCountResponse,
+  GetFollowerCountResponse,
+  GetIsFollowerStatusRequest,
+  GetIsFollowerStatusResponse,
   GetUserRequest,
   GetUserResponse,
   LoginRegisterResponse,
@@ -10,10 +15,11 @@ import {
   PagedUserItemRequest,
   PagedUserItemResponse,
   PostStatusRequest,
+  RegisterRequest,
   Status,
-  TweeterRequest,
   TweeterResponse,
-  User
+  User,
+  UserActionRequest
 } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 import { PagedItemRequest } from "tweeter-shared/dist/model/net/request/PagedItemRequest";
@@ -143,7 +149,7 @@ export class ServerFacade {
     }
   }
 
-  public async logout_server(
+  public async logout_Server(
     request: LogoutRequest
   ): Promise<void> {
     const response = await this.clientCommunicator.doPost<
@@ -156,6 +162,123 @@ export class ServerFacade {
       console.error(response);
       throw new Error(response.message!);
     }
+  }
+
+  public async register_Server(
+    request: RegisterRequest
+  ): Promise<[User, AuthToken]> {
+    const response = await this.clientCommunicator.doPost<
+      RegisterRequest,
+      LoginRegisterResponse
+    >(request, "/user/register");
+
+    const user: User | null = response.success && response.user
+      ? User.fromDto(response.user)
+      : null;
+    const authToken: AuthToken | null = response.success && response.authToken
+      ? AuthToken.fromDto(response.authToken)
+      : null;
+
+    // Handle errors
+    if (response.success) {
+      if (user == null) {
+        throw new Error(`No user found`);
+      } else if (authToken == null) {
+        throw new Error('No authToken found');
+      } else {
+        return [user, authToken];
+      }
+    } else {
+      console.error(response);
+      throw new Error(response.message!);
+    }
+  }
+
+  public async getIsFollowerStatus_Server(
+    request: GetIsFollowerStatusRequest
+  ): Promise<boolean> {
+    const response = await this.clientCommunicator.doPost<
+      GetIsFollowerStatusRequest,
+      GetIsFollowerStatusResponse
+    >(request, "/user/is-follower");
+
+    const isFollower: boolean | null = response.success && response.isFollower !== null
+      ? response.isFollower
+      : null;
+
+    // Handle errors
+    if (response.success) {
+      if (isFollower == null) {
+        throw new Error(`isFollower not found`);
+      } else {
+        return isFollower;
+      }
+    } else {
+      console.error(response);
+      throw new Error(response.message!);
+    }
+  }
+
+  public async getFolloweeCount_Server(
+    request: UserActionRequest
+  ): Promise<number> {
+    const response = await this.clientCommunicator.doPost<
+      UserActionRequest,
+      GetFolloweeCountResponse
+    >(request, "/user/followee-count");
+
+    const followeeCount: number | null = response.success && response.followeeCount !== null
+      ? response.followeeCount
+      : null;
+
+    // Handle errors
+    if (response.success) {
+      if (followeeCount == null) {
+        throw new Error(`followeeCount not found`);
+      } else {
+        return followeeCount;
+      }
+    } else {
+      console.error(response);
+      throw new Error(response.message!);
+    }
+  }
+
+  public async getFollowerCount_Server(
+    request: UserActionRequest
+  ): Promise<number> {
+    const response = await this.clientCommunicator.doPost<
+      UserActionRequest,
+      GetFollowerCountResponse
+    >(request, "/user/follower-count");
+
+    const followerCount: number | null = response.success && response.followerCount !== null
+      ? response.followerCount
+      : null;
+
+    // Handle errors
+    if (response.success) {
+      if (followerCount == null) {
+        throw new Error(`followerCount not found`);
+      } else {
+        return followerCount;
+      }
+    } else {
+      console.error(response);
+      throw new Error(response.message!);
+    }
+  }
+
+  public async follow_Server(
+    request: UserActionRequest
+  ): Promise<[number, number]> {
+    return await this.followUnfollow_Server(request, "/user/follow");
+  }
+
+  public async unfollow_Server(
+    request: UserActionRequest
+  ): Promise<[number, number]> {
+    return await this.followUnfollow_Server(request, "/user/unfollow");
   }
 
   private async getMorePagedItems<T, REQ extends PagedItemRequest, RES extends PagedItemResponse>(
@@ -221,5 +344,36 @@ export class ServerFacade {
       itemName,
       extractItemsFromResponse
     );
+  }
+
+  private async followUnfollow_Server(
+    request: UserActionRequest,
+    endpoint: string
+  ): Promise<[number, number]> {
+    const response = await this.clientCommunicator.doPost<
+      UserActionRequest,
+      FollowUnfollowResponse
+    >(request, endpoint);
+
+    const followerCount: number | null = response.success && response.followerCount !== null
+      ? response.followerCount
+      : null;
+    const followeeCount: number | null = response.success && response.followeeCount !== null
+      ? response.followeeCount
+      : null;
+
+    // Handle errors
+    if (response.success) {
+      if (followerCount == null) {
+        throw new Error(`followerCount not found`);
+      } else if (followeeCount == null) {
+        throw new Error('followeeCount not found');
+      } else {
+        return [followerCount, followeeCount];
+      }
+    } else {
+      console.error(response);
+      throw new Error(response.message!);
+    }
   }
 }
