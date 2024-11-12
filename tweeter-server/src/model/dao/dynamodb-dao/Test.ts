@@ -1,5 +1,6 @@
-import { UserDto } from "tweeter-shared"
+import { StatusDto, UserDto } from "tweeter-shared"
 import { DynamoDBFollowDao } from "./dao/DynamoDBFollowDao"
+import { DynamoDBStatusDao } from "./dao/DynamoDBStatusDao";
 
 const main = async () => {
   // const user: UserDto = {
@@ -17,6 +18,7 @@ const main = async () => {
   // }
 
   const followDao: DynamoDBFollowDao = new DynamoDBFollowDao();
+  const statusDao: DynamoDBStatusDao = new DynamoDBStatusDao();
 
   // await followDao.createFollow(user, user1);
   // console.log("Follow created");
@@ -91,7 +93,7 @@ const main = async () => {
   //   hasMorePages2
   // );
 
-  // const [followers, hasMorePages] = await followDao.loadMoreFollowers("@alias1", 15, undefined);
+  // const [followers, hasMorePages] = await followDao.loadMoreFollowers("@alias", 15, undefined);
   // console.log(
   //   "@alias is followed by: " +
   //   JSON.stringify(followers) +
@@ -101,7 +103,7 @@ const main = async () => {
 
   // const lastFollower = followers[followers.length - 1];
 
-  // const [followers2, hasMorePages2] = await followDao.loadMoreFollowers("@alias1", 15, lastFollower);
+  // const [followers2, hasMorePages2] = await followDao.loadMoreFollowers("@alias", 15, lastFollower);
   // console.log(
   //   "@alias is also followed by: " +
   //   JSON.stringify(followers2) +
@@ -111,6 +113,21 @@ const main = async () => {
 
   // const allFollowersAliases = await followDao.getAllFollowerAliases("@alias")
   // console.log(allFollowersAliases)
+
+  const newStatus: StatusDto = {
+    post: "post1",
+    user: {
+      firstName: "first",
+      lastName: "last",
+      alias: "@alias",
+      imageUrl: "imgUrl"
+    },
+    timestamp: 0
+  }
+
+  // // await statusDao.postStatus(newStatus)
+
+  await statusDao.addStatusToUsersFeed("@user1", newStatus);
 }
 
 main()

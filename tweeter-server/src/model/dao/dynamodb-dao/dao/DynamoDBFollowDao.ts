@@ -19,8 +19,8 @@ export class DynamoDBFollowDao implements FollowDao {
   readonly followeeFirstNameAttr = "followee_first_name";
   readonly followerLastNameAttr = "follower_last_name";
   readonly followeeLastNameAttr = "followee_last_name";
-  readonly followerImgUrlAttr = "follower_img_url";
-  readonly followeeImgUrlAttr = "followee_img_url";
+  readonly followerImageUrlAttr = "follower_image_url";
+  readonly followeeImageUrlAttr = "followee_image_url";
 
   private readonly client: DynamoDBDocumentClient = Client.instance;
 
@@ -41,6 +41,13 @@ export class DynamoDBFollowDao implements FollowDao {
               [this.followerHandleAttr]: lastItem.alias,
               [this.followeeHandleAttr]: alias,
             },
+        ProjectionExpression: '#followerFirstNameAttr, #followerLastNameAttr, #followerHandleAttr, #followerImgUrlAttr',
+        ExpressionAttributeNames: {
+          '#followerFirstNameAttr': this.followerFirstNameAttr,
+          '#followerLastNameAttr': this.followerLastNameAttr,
+          '#followerHandleAttr': this.followerHandleAttr,
+          '#followerImgUrlAttr': this.followerImageUrlAttr
+        }
       };
 
       const items: UserDto[] = [];
@@ -51,7 +58,7 @@ export class DynamoDBFollowDao implements FollowDao {
           firstName: item[this.followerFirstNameAttr],
           lastName: item[this.followerLastNameAttr],
           alias: item[this.followerHandleAttr],
-          imageUrl: item[this.followerImgUrlAttr]
+          imageUrl: item[this.followerImageUrlAttr]
         };
         items.push(
           follower
@@ -81,6 +88,13 @@ export class DynamoDBFollowDao implements FollowDao {
               [this.followerHandleAttr]: alias,
               [this.followeeHandleAttr]: lastItem.alias,
             },
+        ProjectionExpression: '#followeeFirstNameAttr, #followeeLastNameAttr, #followeeHandleAttr, #followeeImgUrlAttr',
+        ExpressionAttributeNames: {
+          '#followeeFirstNameAttr': this.followeeFirstNameAttr,
+          '#followeeLastNameAttr': this.followeeLastNameAttr,
+          '#followeeHandleAttr': this.followeeHandleAttr,
+          '#followeeImgUrlAttr': this.followeeImageUrlAttr
+        }
       };
 
       const items: UserDto[] = [];
@@ -91,7 +105,7 @@ export class DynamoDBFollowDao implements FollowDao {
           firstName: item[this.followeeFirstNameAttr],
           lastName: item[this.followeeLastNameAttr],
           alias: item[this.followeeHandleAttr],
-          imageUrl: item[this.followeeImgUrlAttr]
+          imageUrl: item[this.followeeImageUrlAttr]
         };
         items.push(
           followee
@@ -160,8 +174,8 @@ export class DynamoDBFollowDao implements FollowDao {
           [this.followeeFirstNameAttr]: followee.firstName,
           [this.followerLastNameAttr]: follower.lastName,
           [this.followeeLastNameAttr]: followee.lastName,
-          [this.followerImgUrlAttr]: follower.imageUrl,
-          [this.followeeImgUrlAttr]: followee.imageUrl,
+          [this.followerImageUrlAttr]: follower.imageUrl,
+          [this.followeeImageUrlAttr]: followee.imageUrl,
         },
         ConditionExpression: `attribute_not_exists(#followerHandleAttr) AND attribute_not_exists(#followeeHandleAttr)`,
         ExpressionAttributeNames: {
