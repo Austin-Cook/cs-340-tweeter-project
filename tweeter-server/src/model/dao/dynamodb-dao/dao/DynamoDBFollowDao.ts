@@ -4,11 +4,27 @@ import {
   GetCommand,
   PutCommand,
   QueryCommand,
+  QueryCommandInput,
 } from "@aws-sdk/lib-dynamodb";
 import { UserDto } from "tweeter-shared";
 import { FollowDao } from "../../interface/FollowDao";
 import { Client } from "../DynamoDBClient";
 import { doFailureReportingOperation } from "../../util/FailureReportingOperation";
+import { loadPagedItems } from "./util/LoadPagedItems";
+
+interface FollowerDBRow {
+  'follower_first_name': string,
+  'follower_last_name': string,
+  'follower_handle': string,
+  'follower_image_url': string
+}
+
+interface FolloweeDBRow {
+  'followee_first_name': string,
+  'followee_last_name': string,
+  'followee_handle': string,
+  'followee_image_url': string
+}
 
 export class DynamoDBFollowDao implements FollowDao {
   readonly tableName = "follow"; // a -> follows -> b
@@ -25,98 +41,76 @@ export class DynamoDBFollowDao implements FollowDao {
   private readonly client: DynamoDBDocumentClient = Client.instance;
 
   public async loadMoreFollowers(alias: string, pageSize: number, lastItem: UserDto | undefined): Promise<[UserDto[], boolean]> {
-    return await doFailureReportingOperation(async (): Promise<[UserDto[], boolean]> => {
-      const params = {
-        KeyConditionExpression: this.followeeHandleAttr + " = :followee",
-        ExpressionAttributeValues: {
-          ":followee": alias,
-        },
-        TableName: this.tableName,
-        IndexName: this.indexName,
-        Limit: pageSize,
-        ExclusiveStartKey:
-          lastItem === undefined
-            ? undefined
-            : {
-              [this.followerHandleAttr]: lastItem.alias,
-              [this.followeeHandleAttr]: alias,
-            },
-        ProjectionExpression: '#followerFirstNameAttr, #followerLastNameAttr, #followerHandleAttr, #followerImgUrlAttr',
-        ExpressionAttributeNames: {
-          '#followerFirstNameAttr': this.followerFirstNameAttr,
-          '#followerLastNameAttr': this.followerLastNameAttr,
-          '#followerHandleAttr': this.followerHandleAttr,
-          '#followerImgUrlAttr': this.followerImageUrlAttr
-        }
+    const buildFollowerDto = (item: FollowerDBRow): UserDto => {
+      return {
+        firstName: item[this.followerFirstNameAttr],
+        lastName: item[this.followerLastNameAttr],
+        alias: item[this.followerHandleAttr],
+        imageUrl: item[this.followerImageUrlAttr]
       };
+    }
 
-      const items: UserDto[] = [];
-      const data = await this.client.send(new QueryCommand(params));
-      const hasMorePages = data.LastEvaluatedKey !== undefined;
-      data.Items?.forEach((item) => {
-        const follower: UserDto = {
-          firstName: item[this.followerFirstNameAttr],
-          lastName: item[this.followerLastNameAttr],
-          alias: item[this.followerHandleAttr],
-          imageUrl: item[this.followerImageUrlAttr]
-        };
-        items.push(
-          follower
-        )
-      });
+    const params = {
+      KeyConditionExpression: this.followeeHandleAttr + " = :followee",
+      ExpressionAttributeValues: {
+        ":followee": alias,
+      },
+      TableName: this.tableName,
+      IndexName: this.indexName,
+      Limit: pageSize,
+      ExclusiveStartKey:
+        lastItem === undefined
+          ? undefined
+          : {
+            [this.followerHandleAttr]: lastItem.alias,
+            [this.followeeHandleAttr]: alias,
+          },
+      ProjectionExpression: '#followerFirstNameAttr, #followerLastNameAttr, #followerHandleAttr, #followerImgUrlAttr',
+      ExpressionAttributeNames: {
+        '#followerFirstNameAttr': this.followerFirstNameAttr,
+        '#followerLastNameAttr': this.followerLastNameAttr,
+        '#followerHandleAttr': this.followerHandleAttr,
+        '#followerImgUrlAttr': this.followerImageUrlAttr
+      }
+    };
 
-      return [items, hasMorePages];
-    },
-      "DynamoDBFollowDao",
-      "loadMoreFollowers"
-    );
+    return await this.loadPagedUserItems(params, buildFollowerDto, "loadMoreFollowers");
   }
 
   public async loadMoreFollowees(alias: string, pageSize: number, lastItem: UserDto | undefined): Promise<[UserDto[], boolean]> {
-    return await doFailureReportingOperation(async () => {
-      const params = {
-        KeyConditionExpression: this.followerHandleAttr + " = :follower",
-        ExpressionAttributeValues: {
-          ":follower": alias,
-        },
-        TableName: this.tableName,
-        Limit: pageSize,
-        ExclusiveStartKey:
-          lastItem === undefined
-            ? undefined
-            : {
-              [this.followerHandleAttr]: alias,
-              [this.followeeHandleAttr]: lastItem.alias,
-            },
-        ProjectionExpression: '#followeeFirstNameAttr, #followeeLastNameAttr, #followeeHandleAttr, #followeeImgUrlAttr',
-        ExpressionAttributeNames: {
-          '#followeeFirstNameAttr': this.followeeFirstNameAttr,
-          '#followeeLastNameAttr': this.followeeLastNameAttr,
-          '#followeeHandleAttr': this.followeeHandleAttr,
-          '#followeeImgUrlAttr': this.followeeImageUrlAttr
-        }
+    const buildFolloweeDto = (item: FolloweeDBRow): UserDto => {
+      return {
+        firstName: item[this.followeeFirstNameAttr],
+        lastName: item[this.followeeLastNameAttr],
+        alias: item[this.followeeHandleAttr],
+        imageUrl: item[this.followeeImageUrlAttr]
       };
+    }
 
-      const items: UserDto[] = [];
-      const data = await this.client.send(new QueryCommand(params));
-      const hasMorePages = data.LastEvaluatedKey !== undefined;
-      data.Items?.forEach((item) => {
-        const followee: UserDto = {
-          firstName: item[this.followeeFirstNameAttr],
-          lastName: item[this.followeeLastNameAttr],
-          alias: item[this.followeeHandleAttr],
-          imageUrl: item[this.followeeImageUrlAttr]
-        };
-        items.push(
-          followee
-        )
-      });
+    const params = {
+      KeyConditionExpression: this.followerHandleAttr + " = :follower",
+      ExpressionAttributeValues: {
+        ":follower": alias,
+      },
+      TableName: this.tableName,
+      Limit: pageSize,
+      ExclusiveStartKey:
+        lastItem === undefined
+          ? undefined
+          : {
+            [this.followerHandleAttr]: alias,
+            [this.followeeHandleAttr]: lastItem.alias,
+          },
+      ProjectionExpression: '#followeeFirstNameAttr, #followeeLastNameAttr, #followeeHandleAttr, #followeeImgUrlAttr',
+      ExpressionAttributeNames: {
+        '#followeeFirstNameAttr': this.followeeFirstNameAttr,
+        '#followeeLastNameAttr': this.followeeLastNameAttr,
+        '#followeeHandleAttr': this.followeeHandleAttr,
+        '#followeeImgUrlAttr': this.followeeImageUrlAttr
+      }
+    };
 
-      return [items, hasMorePages];
-    },
-      "DynamoDBFollowDao",
-      "loadMoreFollowees"
-    );
+    return await this.loadPagedUserItems(params, buildFolloweeDto, "loadMoreFollowees");
   }
 
   /**
@@ -227,5 +221,9 @@ export class DynamoDBFollowDao implements FollowDao {
       [this.followerHandleAttr]: followerAlias,
       [this.followeeHandleAttr]: followeeAlias
     }
+  }
+
+  private loadPagedUserItems = async <DTO, ROW>(params: QueryCommandInput, buildDto: (items: ROW) => DTO, daoMethod: string) => {
+    return loadPagedItems(this.client, params, buildDto, "DynamoDBFollowDao", daoMethod);
   }
 }

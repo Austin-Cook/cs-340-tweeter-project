@@ -122,12 +122,50 @@ const main = async () => {
       alias: "@alias",
       imageUrl: "imgUrl"
     },
-    timestamp: 0
+    timestamp: 2
   }
 
   // // await statusDao.postStatus(newStatus)
 
-  await statusDao.addStatusToUsersFeed("@user1", newStatus);
+  // await statusDao.addStatusToUsersFeed("@user1", newStatus);
+
+  // const [feed, hasMorePages] = await statusDao.loadMoreFeedItems("@user", 1, undefined);
+  // console.log(
+  //   "@alias feed: " +
+  //   JSON.stringify(feed) +
+  //   ", and are there more pages? " +
+  //   hasMorePages
+  // );
+
+  // const lastStatus = feed[feed.length - 1];
+
+  // const [feed2, hasMorePages2] = await statusDao.loadMoreFeedItems("@user", 15, lastStatus);
+  // console.log(
+  //   "@alias also has feed: " +
+  //   JSON.stringify(feed2) +
+  //   ", and are there more pages? " +
+  //   hasMorePages2
+  // );
+
+  // await statusDao.postStatus(newStatus);
+
+  // const [story, hasMorePages] = await statusDao.loadMoreStoryItems("@alias", 1, undefined);
+  // console.log(
+  //   "@alias story: " +
+  //   JSON.stringify(story) +
+  //   ", and are there more pages? " +
+  //   hasMorePages
+  // );
+
+  // const lastStatus = story[story.length - 1];
+
+  // const [story2, hasMorePages2] = await statusDao.loadMoreStoryItems("@alias", 15, lastStatus);
+  // console.log(
+  //   "@alias also has story: " +
+  //   JSON.stringify(story2) +
+  //   ", and are there more pages? " +
+  //   hasMorePages2
+  // );
 }
 
 main()

@@ -1,8 +1,18 @@
 import { StatusDto } from "tweeter-shared";
 import { StatusDao } from "../../interface/StatusDao";
-import { DynamoDBDocumentClient, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, PutCommand, QueryCommandInput } from "@aws-sdk/lib-dynamodb";
 import { Client } from "../DynamoDBClient";
 import { doFailureReportingOperation } from "../../util/FailureReportingOperation";
+import { loadPagedItems } from "./util/LoadPagedItems";
+
+interface StatusDBRow {
+  alias: string,
+  timestamp: number,
+  post: string,
+  first_name: string,
+  last_name: string,
+  image_url: string
+}
 
 export class DynamoDBStatusDao implements StatusDao {
   readonly statusTableName = "status"; // Partition: alias(S), Sort: timestamp(N), Attrs: post(S), firstName(S), lastName(S), imgUrl(S)
@@ -17,14 +27,44 @@ export class DynamoDBStatusDao implements StatusDao {
 
   private readonly client: DynamoDBDocumentClient = Client.instance;
 
-  public async loadMoreFeedItems(alias: string, pageSize: number, lastItem: StatusDto | null): Promise<[StatusDto[], boolean]> {
-    // TODO
-    return [{} as any, true];
+  public async loadMoreFeedItems(followerAlias: string, pageSize: number, lastItem: StatusDto | undefined): Promise<[StatusDto[], boolean]> {
+    const params = {
+      KeyConditionExpression: this.followerAliasAttr + " = :followerAlias",
+      ExpressionAttributeValues: {
+        ":followerAlias": followerAlias,
+      },
+      TableName: this.feedTableName,
+      Limit: pageSize,
+      ExclusiveStartKey:
+        lastItem === undefined
+          ? undefined
+          : {
+            [this.followerAliasAttr]: followerAlias,
+            [this.timestampAttr]: lastItem.timestamp,
+          }
+    };
+
+    return await this.loadPagedStatusItems(params, "loadMoreFeedItems");
   }
 
-  public async loadMoreStoryItems(alias: string, pageSize: number, lastItem: StatusDto | null): Promise<[StatusDto[], boolean]> {
-    // TODO
-    return [{} as any, true];
+  public async loadMoreStoryItems(alias: string, pageSize: number, lastItem: StatusDto | undefined): Promise<[StatusDto[], boolean]> {
+    const params = {
+      KeyConditionExpression: this.aliasAttr + " = :alias",
+      ExpressionAttributeValues: {
+        ":alias": alias,
+      },
+      TableName: this.statusTableName,
+      Limit: pageSize,
+      ExclusiveStartKey:
+        lastItem === undefined
+          ? undefined
+          : {
+            [this.aliasAttr]: alias,
+            [this.timestampAttr]: lastItem.timestamp,
+          }
+    };
+
+    return await this.loadPagedStatusItems(params, "loadMoreFeedItems");
   }
 
   public async postStatus(newStatus: StatusDto): Promise<void> {
@@ -77,4 +117,22 @@ export class DynamoDBStatusDao implements StatusDao {
       "addStatusToUsersFeed"
     )
   }
+
+  private loadPagedStatusItems = async (params: QueryCommandInput, daoMethod: string) => {
+    return loadPagedItems(this.client, params, this.buildStatusDto, "DynamoDBStatusDao", daoMethod);
+  }
+
+  private buildStatusDto = (item: StatusDBRow) => {
+    return {
+      post: item[this.postAttr],
+      user: {
+        firstName: item[this.firstNameAttr],
+        lastName: item[this.lastNameAttr],
+        alias: item[this.aliasAttr],
+        imageUrl: item[this.imageUrlAttr]
+      },
+      timestamp: item[this.timestampAttr],
+    };
+  }
 }
+
