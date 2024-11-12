@@ -13,8 +13,12 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "tweeter-shared": "file:../tweeter-shared",
+    "@aws-sdk/lib-dynamodb": "^3.689.0",
     "date-fns": "^3.3.1",
+    "tweeter-shared": "file:../tweeter-shared",
     "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2"
   }
 }
