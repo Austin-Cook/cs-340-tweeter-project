@@ -1,6 +1,8 @@
-import { StatusDto, UserDto } from "tweeter-shared"
+import { AuthTokenDto, StatusDto, UserDto } from "tweeter-shared"
 import { DynamoDBFollowDao } from "./dao/DynamoDBFollowDao"
 import { DynamoDBStatusDao } from "./dao/DynamoDBStatusDao";
+import { DynamoDBAuthDao } from "./dao/DynamoDBAuthDao";
+import { DynamoDBUserDao } from "./dao/DynamoDBUserDao";
 
 const main = async () => {
   // const user: UserDto = {
@@ -19,6 +21,8 @@ const main = async () => {
 
   const followDao: DynamoDBFollowDao = new DynamoDBFollowDao();
   const statusDao: DynamoDBStatusDao = new DynamoDBStatusDao();
+  const authDao: DynamoDBAuthDao = new DynamoDBAuthDao();
+  const userDao: DynamoDBUserDao = new DynamoDBUserDao();
 
   // await followDao.createFollow(user, user1);
   // console.log("Follow created");
@@ -166,6 +170,46 @@ const main = async () => {
   //   ", and are there more pages? " +
   //   hasMorePages2
   // );
+
+  // const token: AuthTokenDto = {
+  //   token: "token2",
+  //   timestamp: 0
+  // }
+
+  // const user: UserDto = {
+  //   firstName: "first",
+  //   lastName: "last",
+  //   alias: "@alias",
+  //   imageUrl: "imgUrl"
+  // }
+
+  // await authDao.createAuthToken(token, user);
+
+  // const [userRes, timestampRes] = await authDao.getAuthenticatedUser("token3");
+  // console.log("user: ", JSON.stringify(userRes));
+  // console.log("timestamp: ", JSON.stringify(timestampRes));
+
+  // await authDao.revokeToken("token1");
+
+  // const user: UserDto = {
+  //   firstName: "first",
+  //   lastName: "last",
+  //   alias: "@alias",
+  //   imageUrl: "imgUrl"
+  // }
+
+  // await userDao.createUser(user, "passwordHash");
+
+  // const user: UserDto = await userDao.getUser("@alias1");
+  // console.log(JSON.stringify(user));
+
+  // const passwordHash: string = await userDao.getSavedPasswordHash("@alias1");
+  // console.log(passwordHash);
+
+  // const [numFollowers, numFollowees] = await userDao.getFollowCounts("@alias1");
+  // console.log(`${numFollowers}, ${numFollowees}`);
+
+  // await userDao.decrementNumFollowers("@alias");
 }
 
 main()
