@@ -1,8 +1,8 @@
 import { AuthTokenDto, StatusDto, UserDto } from "tweeter-shared"
-import { DynamoDBFollowDao } from "./dao/DynamoDBFollowDao"
-import { DynamoDBStatusDao } from "./dao/DynamoDBStatusDao";
-import { DynamoDBAuthDao } from "./dao/DynamoDBAuthDao";
-import { DynamoDBUserDao } from "./dao/DynamoDBUserDao";
+import { DynamoDBFollowDao } from "./dynamodb-dao/dao/DynamoDBFollowDao"
+import { DynamoDBStatusDao } from "./dynamodb-dao/dao/DynamoDBStatusDao";
+import { DynamoDBAuthDao } from "./dynamodb-dao/dao/DynamoDBAuthDao";
+import { DynamoDBUserDao } from "./dynamodb-dao/dao/DynamoDBUserDao";
 
 const main = async () => {
   // const user: UserDto = {
