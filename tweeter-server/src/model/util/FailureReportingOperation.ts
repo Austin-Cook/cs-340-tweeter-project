@@ -6,7 +6,7 @@ export const doFailureReportingOperation = async <RET>(
   try {
     return await operation();
   } catch (error) {
-    throw new Error(`[${daoName}.${daoMethod}()] failed because of exception: ${(error as Error).message}`);
+    throw getError(error as Error, daoName, daoMethod);
   }
 }
 
@@ -18,6 +18,10 @@ export const doFailureReportingOperation_Sync = <RET>(
   try {
     return operation();
   } catch (error) {
-    throw new Error(`[${daoName}.${daoMethod}()] failed because of exception: ${(error as Error).message}`);
+    throw getError(error as Error, daoName, daoMethod);
   }
+}
+
+const getError = (error: Error, daoName: string, daoMethod: string): Error => {
+  return new Error(`\n[${daoName}.${daoMethod}()] failed because of exception: ${(error as Error).message}`)
 }

@@ -6,6 +6,7 @@ import { DynamoDBUserDao } from "./dynamodb-dao/dao/DynamoDBUserDao";
 import { AuthService } from "../service/AuthService";
 import { DynamoDBS3DaoFactory } from "./factory/DynamoDBS3DaoFactory";
 import { FollowService } from "../service/FollowService";
+import { StatusService } from "../service/StatusService";
 
 const main = async () => {
   // const user: UserDto = {
@@ -28,6 +29,7 @@ const main = async () => {
   const userDao: DynamoDBUserDao = new DynamoDBUserDao();
   const authService: AuthService = new AuthService(DynamoDBS3DaoFactory.instance);
   const followService: FollowService = new FollowService(DynamoDBS3DaoFactory.instance);
+  const statusService: StatusService = new StatusService(DynamoDBS3DaoFactory.instance);
 
   // await followDao.createFollow(user, user1);
   // console.log("Follow created");
@@ -123,16 +125,16 @@ const main = async () => {
   // const allFollowersAliases = await followDao.getAllFollowerAliases("@alias")
   // console.log(allFollowersAliases)
 
-  const newStatus: StatusDto = {
-    post: "post",
-    user: {
-      firstName: "first",
-      lastName: "last",
-      alias: "@alias3",
-      imageUrl: "imgUrl"
-    },
-    timestamp: Date.now()
-  }
+  // const newStatus: StatusDto = {
+  //   post: "post",
+  //   user: {
+  //     firstName: "first",
+  //     lastName: "last",
+  //     alias: "@alias3",
+  //     imageUrl: "imgUrl"
+  //   },
+  //   timestamp: Date.now()
+  // }
 
   // // await statusDao.postStatus(newStatus)
 
@@ -290,8 +292,54 @@ const main = async () => {
   //   hasMorePages2
   // );
 
-  
+  // const [feed, hasMorePages] = await statusService.loadMoreFeedItems("token", "@alias", 2, null);
+  // console.log(
+  //   "@alias feed: " +
+  //   JSON.stringify(feed) +
+  //   ", and are there more pages? " +
+  //   hasMorePages
+  // );
 
+  // const lastStatus = feed[feed.length - 1];
+
+  // const [feed2, hasMorePages2] = await statusService.loadMoreFeedItems("token", "@alias", 15, lastStatus);
+  // console.log(
+  //   "@alias also has feed: " +
+  //   JSON.stringify(feed2) +
+  //   ", and are there more pages? " +
+  //   hasMorePages2
+  // );
+
+  // const [story, hasMorePages] = await statusService.loadMoreStoryItems("0c9dbf28-4c86-4f59-a76a-0adcdd30eb0b", "@alias", 1, null);
+  // console.log(
+  //   "@alias story: " +
+  //   JSON.stringify(story) +
+  //   ", and are there more pages? " +
+  //   hasMorePages
+  // );
+
+  // const lastStatus = story[story.length - 1];
+
+  // const [story2, hasMorePages2] = await statusService.loadMoreStoryItems("0c9dbf28-4c86-4f59-a76a-0adcdd30eb0b", "@alias", 15, lastStatus);
+  // console.log(
+  //   "@alias also has story: " +
+  //   JSON.stringify(story2) +
+  //   ", and are there more pages? " +
+  //   hasMorePages2
+  // );
+
+  // const newStatus: StatusDto = {
+  //   post: "hello world2!",
+  //   user: {
+  //     firstName: "first",
+  //     lastName: "last",
+  //     alias: "@alias",
+  //     imageUrl: "imgUrl"
+  //   },
+  //   timestamp: Date.now()
+  // }
+
+  // await statusService.postStatus("0c9dbf28-4c86-4f59-a76a-0adcdd30eb0b", newStatus);
 }
 
 main()
