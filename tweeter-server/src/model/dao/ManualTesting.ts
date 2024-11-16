@@ -3,6 +3,8 @@ import { DynamoDBFollowDao } from "./dynamodb-dao/dao/DynamoDBFollowDao"
 import { DynamoDBStatusDao } from "./dynamodb-dao/dao/DynamoDBStatusDao";
 import { DynamoDBAuthDao } from "./dynamodb-dao/dao/DynamoDBAuthDao";
 import { DynamoDBUserDao } from "./dynamodb-dao/dao/DynamoDBUserDao";
+import { AuthService } from "../service/AuthService";
+import { DynamoDBS3DaoFactory } from "./factory/DynamoDBS3DaoFactory";
 
 const main = async () => {
   // const user: UserDto = {
@@ -23,6 +25,7 @@ const main = async () => {
   const statusDao: DynamoDBStatusDao = new DynamoDBStatusDao();
   const authDao: DynamoDBAuthDao = new DynamoDBAuthDao();
   const userDao: DynamoDBUserDao = new DynamoDBUserDao();
+  const authService: AuthService = new AuthService(DynamoDBS3DaoFactory.instance);
 
   // await followDao.createFollow(user, user1);
   // console.log("Follow created");
@@ -133,23 +136,23 @@ const main = async () => {
 
   // await statusDao.addStatusToUsersFeed("@alias", newStatus);
 
-  const [feed, hasMorePages] = await statusDao.loadMoreFeedItems("@alias", 2, undefined);
-  console.log(
-    "@alias feed: " +
-    JSON.stringify(feed) +
-    ", and are there more pages? " +
-    hasMorePages
-  );
+  // const [feed, hasMorePages] = await statusDao.loadMoreFeedItems("@alias", 2, undefined);
+  // console.log(
+  //   "@alias feed: " +
+  //   JSON.stringify(feed) +
+  //   ", and are there more pages? " +
+  //   hasMorePages
+  // );
 
-  const lastStatus = feed[feed.length - 1];
+  // const lastStatus = feed[feed.length - 1];
 
-  const [feed2, hasMorePages2] = await statusDao.loadMoreFeedItems("@alias", 15, lastStatus);
-  console.log(
-    "@alias also has feed: " +
-    JSON.stringify(feed2) +
-    ", and are there more pages? " +
-    hasMorePages2
-  );
+  // const [feed2, hasMorePages2] = await statusDao.loadMoreFeedItems("@alias", 15, lastStatus);
+  // console.log(
+  //   "@alias also has feed: " +
+  //   JSON.stringify(feed2) +
+  //   ", and are there more pages? " +
+  //   hasMorePages2
+  // );
 
   // await statusDao.postStatus(newStatus);
 
@@ -172,7 +175,7 @@ const main = async () => {
   // );
 
   // const token: AuthTokenDto = {
-  //   token: "token2",
+  //   token: "token1",
   //   timestamp: 0
   // }
 
@@ -184,6 +187,7 @@ const main = async () => {
   // }
 
   // await authDao.createAuthToken(token, user);
+  // await authDao.renewAuthToken("token", 12343);
 
   // const [userRes, timestampRes] = await authDao.getAuthenticatedUser("token3");
   // console.log("user: ", JSON.stringify(userRes));
@@ -210,6 +214,38 @@ const main = async () => {
   // console.log(`${numFollowers}, ${numFollowees}`);
 
   // await userDao.decrementNumFollowers("@alias");
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // SEVICE TESTS
+
+  const user: UserDto = {
+    firstName: "first",
+    lastName: "last",
+    alias: "@alias",
+    imageUrl: "imgUrl"
+  };
+  const password = "password";
+
+  // const authToken: AuthTokenDto = await authService.createAuthToken(user, password);
+  // console.log(JSON.stringify(authToken))
+
+  // console.log(authService.hashPassword(password, user.alias))
+  // console.log(authService.hashPassword("password1", "alias1"))
+  // console.log(authService.match("password1", "alias1", "$2a$10$kctvFiJR1T0X2bAiwJ46m.htZXHIgQn1OBtiClZslp7ZAdqE5W7H2"))
+
+  // console.log(await authService.renewAuthTokenTimestamp("0c9dbf28-4c86-4f59-a76a-0adcdd30eb0b"));
+  // await authService.verifyAuthenticatedUser("0c9dbf28-4c86-4f59-a76a-0adcdd30eb0b", user.alias);
 }
 
 main()

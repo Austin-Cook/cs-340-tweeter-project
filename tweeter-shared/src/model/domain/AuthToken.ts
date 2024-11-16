@@ -6,8 +6,12 @@ export class AuthToken {
 
   public static Generate(): AuthToken {
     const token: string = AuthToken.generateToken();
-    const timestamp: number = Date.now();
+    const timestamp: number = this.generateTimestamp();
     return new AuthToken(token, timestamp);
+  }
+
+  public static generateTimestamp(): number {
+    return Date.now();
   }
 
   private static generateToken(): string {

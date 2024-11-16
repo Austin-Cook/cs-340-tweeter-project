@@ -1,7 +1,7 @@
 import { AuthTokenDto, UserDto } from "tweeter-shared";
 import { AuthDao } from "../../interface/AuthDao";
 import { doFailureReportingOperation } from "../../../util/FailureReportingOperation";
-import { DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { Client } from "../DynamoDBClient";
 
 export class DynamoDBAuthDao implements AuthDao {
@@ -31,6 +31,27 @@ export class DynamoDBAuthDao implements AuthDao {
       "DynamoDBAuthDao",
       "createAuthToken"
     );
+  }
+
+  public async renewAuthToken(token: string, newTimestamp: number) {
+    return await doFailureReportingOperation(async () => {
+      const params = {
+        TableName: this.tableName,
+        Key: this.generateAuthKeyItem(token),
+        ExpressionAttributeNames: {
+          '#tokenAttr': this.tokenAttr,
+          "#timestampAttr": this.timestampAttr
+        },
+        ExpressionAttributeValues: { ":newTimestamp": newTimestamp },
+        UpdateExpression:
+          "SET #timestampAttr = :newTimestamp",
+        ConditionExpression: `attribute_exists(#tokenAttr)`,
+      };
+      await this.client.send(new UpdateCommand(params));
+    },
+      "DynamoDBAuthDao",
+      "renewAuthToken"
+    )
   }
 
   public async getAuthenticatedUser(token: string): Promise<[UserDto, number]> {
