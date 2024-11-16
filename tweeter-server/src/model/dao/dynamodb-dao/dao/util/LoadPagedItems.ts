@@ -1,5 +1,5 @@
 import { DynamoDBDocumentClient, QueryCommand, QueryCommandInput } from "@aws-sdk/lib-dynamodb";
-import { doFailureReportingOperation } from "../../../util/FailureReportingOperation";
+import { doFailureReportingOperation } from "../../../../util/FailureReportingOperation";
 
 export const loadPagedItems = async <DTO, ROW>(client: DynamoDBDocumentClient, params: QueryCommandInput, buildDto: (items: ROW) => DTO, daoName: string, daoMethod: string) => {
   return await doFailureReportingOperation(async (): Promise<[DTO[], boolean]> => {

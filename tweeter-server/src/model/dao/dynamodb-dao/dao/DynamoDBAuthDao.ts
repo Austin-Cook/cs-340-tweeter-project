@@ -1,6 +1,6 @@
 import { AuthTokenDto, UserDto } from "tweeter-shared";
 import { AuthDao } from "../../interface/AuthDao";
-import { doFailureReportingOperation } from "../../util/FailureReportingOperation";
+import { doFailureReportingOperation } from "../../../util/FailureReportingOperation";
 import { DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { Client } from "../DynamoDBClient";
 

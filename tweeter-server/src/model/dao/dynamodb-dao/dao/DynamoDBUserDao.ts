@@ -2,7 +2,7 @@ import { UserDto } from "tweeter-shared";
 import { UserDao } from "../../interface/UserDao";
 import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { Client } from "../DynamoDBClient";
-import { doFailureReportingOperation } from "../../util/FailureReportingOperation";
+import { doFailureReportingOperation } from "../../../util/FailureReportingOperation";
 
 export class DynamoDBUserDao implements UserDao {
   readonly tableName = "user"; // Partition: token(S), Attrs: timestamp(N), alias(S)

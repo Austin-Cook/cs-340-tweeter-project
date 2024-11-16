@@ -2,8 +2,9 @@ import { StatusDto } from "tweeter-shared";
 import { StatusDao } from "../../interface/StatusDao";
 import { DynamoDBDocumentClient, PutCommand, QueryCommandInput } from "@aws-sdk/lib-dynamodb";
 import { Client } from "../DynamoDBClient";
-import { doFailureReportingOperation } from "../../util/FailureReportingOperation";
+import { doFailureReportingOperation } from "../../../util/FailureReportingOperation";
 import { loadPagedItems } from "./util/LoadPagedItems";
+import { format } from "date-fns";
 
 interface StatusDBRow {
   alias: string,
@@ -23,7 +24,8 @@ export class DynamoDBStatusDao implements StatusDao {
   readonly lastNameAttr = "last_name";
   readonly imageUrlAttr = "image_url";
   readonly feedTableName = "feed"; // Partition: follower_alias(S), Sort: timestamp, Attrs: alias(S), post(S), firstName(S), lastName(S), imgUrl(S)
-  readonly followerAliasAttr = "follower_alias"
+  readonly followerAliasAttr = "follower_alias";
+  readonly timestampAliasAttr = "timestamp_alias";
 
   private readonly client: DynamoDBDocumentClient = Client.instance;
 
@@ -40,7 +42,7 @@ export class DynamoDBStatusDao implements StatusDao {
           ? undefined
           : {
             [this.followerAliasAttr]: followerAlias,
-            [this.timestampAttr]: lastItem.timestamp,
+            [this.timestampAliasAttr]: this.createTimeStampAliasValue(lastItem.timestamp, lastItem.user.alias),
           }
     };
 
@@ -98,17 +100,18 @@ export class DynamoDBStatusDao implements StatusDao {
         TableName: this.feedTableName,
         Item: {
           [this.followerAliasAttr]: followerAlias,
-          [this.timestampAttr]: status.timestamp,
+          [this.timestampAliasAttr]: this.createTimeStampAliasValue(status.timestamp, status.user.alias),
           [this.aliasAttr]: status.user.alias,
+          [this.timestampAttr]: status.timestamp,
           [this.postAttr]: status.post,
           [this.firstNameAttr]: status.user.firstName,
           [this.lastNameAttr]: status.user.lastName,
           [this.imageUrlAttr]: status.user.imageUrl
         },
-        ConditionExpression: `attribute_not_exists(#followerAliasAttr) AND attribute_not_exists(#timestampAttr)`,
+        ConditionExpression: `attribute_not_exists(#followerAliasAttr) AND attribute_not_exists(#timestampAliasAttr)`,
         ExpressionAttributeNames: {
           '#followerAliasAttr': this.followerAliasAttr,
-          '#timestampAttr': this.timestampAttr,
+          '#timestampAliasAttr': this.timestampAliasAttr,
         }
       };
       await this.client.send(new PutCommand(params));
@@ -133,5 +136,9 @@ export class DynamoDBStatusDao implements StatusDao {
       },
       timestamp: item[this.timestampAttr],
     };
+  }
+
+  private createTimeStampAliasValue(timestamp: number, alias: string): string {
+    return format(timestamp, "yyyy-MM-dd-HH:mm:ss") + alias;
   }
 }

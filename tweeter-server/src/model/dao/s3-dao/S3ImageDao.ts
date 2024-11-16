@@ -1,6 +1,6 @@
 import { ObjectCannedACL, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { ImageDao } from "../interface/ImageDao";
-import { doFailureReportingOperation } from "../util/FailureReportingOperation";
+import { doFailureReportingOperation } from "../../util/FailureReportingOperation";
 
 export class S3ImageDao implements ImageDao {
   readonly BUCKET = "tweeter-server-profile-images";

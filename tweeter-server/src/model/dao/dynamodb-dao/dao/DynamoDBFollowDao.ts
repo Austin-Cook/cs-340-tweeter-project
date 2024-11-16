@@ -9,7 +9,7 @@ import {
 import { UserDto } from "tweeter-shared";
 import { FollowDao } from "../../interface/FollowDao";
 import { Client } from "../DynamoDBClient";
-import { doFailureReportingOperation } from "../../util/FailureReportingOperation";
+import { doFailureReportingOperation } from "../../../util/FailureReportingOperation";
 import { loadPagedItems } from "./util/LoadPagedItems";
 
 interface FollowerDBRow {

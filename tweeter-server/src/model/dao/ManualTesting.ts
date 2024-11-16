@@ -119,37 +119,37 @@ const main = async () => {
   // console.log(allFollowersAliases)
 
   const newStatus: StatusDto = {
-    post: "post1",
+    post: "post",
     user: {
       firstName: "first",
       lastName: "last",
-      alias: "@alias",
+      alias: "@alias3",
       imageUrl: "imgUrl"
     },
-    timestamp: 2
+    timestamp: Date.now()
   }
 
   // // await statusDao.postStatus(newStatus)
 
-  // await statusDao.addStatusToUsersFeed("@user1", newStatus);
+  // await statusDao.addStatusToUsersFeed("@alias", newStatus);
 
-  // const [feed, hasMorePages] = await statusDao.loadMoreFeedItems("@user", 1, undefined);
-  // console.log(
-  //   "@alias feed: " +
-  //   JSON.stringify(feed) +
-  //   ", and are there more pages? " +
-  //   hasMorePages
-  // );
+  const [feed, hasMorePages] = await statusDao.loadMoreFeedItems("@alias", 2, undefined);
+  console.log(
+    "@alias feed: " +
+    JSON.stringify(feed) +
+    ", and are there more pages? " +
+    hasMorePages
+  );
 
-  // const lastStatus = feed[feed.length - 1];
+  const lastStatus = feed[feed.length - 1];
 
-  // const [feed2, hasMorePages2] = await statusDao.loadMoreFeedItems("@user", 15, lastStatus);
-  // console.log(
-  //   "@alias also has feed: " +
-  //   JSON.stringify(feed2) +
-  //   ", and are there more pages? " +
-  //   hasMorePages2
-  // );
+  const [feed2, hasMorePages2] = await statusDao.loadMoreFeedItems("@alias", 15, lastStatus);
+  console.log(
+    "@alias also has feed: " +
+    JSON.stringify(feed2) +
+    ", and are there more pages? " +
+    hasMorePages2
+  );
 
   // await statusDao.postStatus(newStatus);
 
