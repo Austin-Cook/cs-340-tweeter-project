@@ -71,6 +71,29 @@ export class DynamoDBAuthDao implements AuthDao {
     );
   }
 
+  public async getTimestamp_Soft(token: string): Promise<number | null> {
+    return await doFailureReportingOperation(async () => {
+      const params = {
+        TableName: this.tableName,
+        Key: this.generateAuthKeyItem(token),
+        ProjectionExpression: '#timestampAttr',
+        ExpressionAttributeNames: {
+          '#timestampAttr': this.timestampAttr,
+        }
+      };
+      const output = await this.client.send(new GetCommand(params));
+      if (output.Item == undefined) {
+        // token doesn't exist
+        return null;
+      }
+
+      return output.Item[this.timestampAttr];
+    },
+      "DynamoDBAuthDao",
+      "getTimestamp_Soft"
+    );
+  }
+
   /**
    * Note that we don't check if the token exists. This allows a user to follow the log out process
    * even after a token has expired with no issues.

@@ -6,11 +6,11 @@ import { doFailureReportingOperation, doFailureReportingOperation_Sync } from ".
 import { compareSync, hashSync } from "bcryptjs";
 
 export class AuthService {
-  private _userDao: UserDao;
-  private _authDao: AuthDao;
+  private readonly _userDao: UserDao;
+  private readonly _authDao: AuthDao;
 
   // in milliseconds
-  readonly _timestampDuration = 3600000; // 1 hour
+  private readonly _timestampDuration = 3600000; // 1 hour
 
   constructor(daoFactory: DaoFactory) {
     this._userDao = daoFactory.createUserDao();
@@ -50,7 +50,7 @@ export class AuthService {
    * */
   public async renewAuthTokenTimestamp(token: string): Promise<boolean> {
     return await doFailureReportingOperation(async () => {
-      if (await this.isAuthTokenExpired(token)) {
+      if (!(await this.isAuthTokenActive(token))) {
         // don't update if authToken is expired
         return false;
       }
@@ -62,7 +62,7 @@ export class AuthService {
       return true;
     },
       "AuthService",
-      "updateAuthTokenTimestamp"
+      "renewAuthTokenTimestamp"
     )
   }
 
@@ -104,10 +104,18 @@ export class AuthService {
     );
   }
 
-  private async isAuthTokenExpired(token: string): Promise<boolean> {
-    const [actualUser, timestamp] = await this._authDao.getAuthenticatedUser(token);
+  public async isAuthTokenActive(token: string): Promise<boolean> { // FIXME CHANGE TO PRIVATE
+    return doFailureReportingOperation(async () => {
+      const timestamp: number | null = await this._authDao.getTimestamp_Soft(token);
+      if (timestamp == null) {
+        return false;
+      }
 
-    return !this.isTimestampValid(timestamp);
+      return this.isTimestampValid(timestamp);
+    },
+      "AuthService",
+      "isAuthTokenActive"
+    );
   }
 
   /**

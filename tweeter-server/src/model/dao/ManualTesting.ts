@@ -5,6 +5,7 @@ import { DynamoDBAuthDao } from "./dynamodb-dao/dao/DynamoDBAuthDao";
 import { DynamoDBUserDao } from "./dynamodb-dao/dao/DynamoDBUserDao";
 import { AuthService } from "../service/AuthService";
 import { DynamoDBS3DaoFactory } from "./factory/DynamoDBS3DaoFactory";
+import { FollowService } from "../service/FollowService";
 
 const main = async () => {
   // const user: UserDto = {
@@ -26,6 +27,7 @@ const main = async () => {
   const authDao: DynamoDBAuthDao = new DynamoDBAuthDao();
   const userDao: DynamoDBUserDao = new DynamoDBUserDao();
   const authService: AuthService = new AuthService(DynamoDBS3DaoFactory.instance);
+  const followService: FollowService = new FollowService(DynamoDBS3DaoFactory.instance);
 
   // await followDao.createFollow(user, user1);
   // console.log("Follow created");
@@ -195,6 +197,8 @@ const main = async () => {
 
   // await authDao.revokeToken("token1");
 
+  // console.log(await authDao.getTimestamp_Soft("62b2c0e6-59b6-4599-974a-8a93e7ac0368"));
+
   // const user: UserDto = {
   //   firstName: "first",
   //   lastName: "last",
@@ -229,13 +233,13 @@ const main = async () => {
 
   // SEVICE TESTS
 
-  const user: UserDto = {
-    firstName: "first",
-    lastName: "last",
-    alias: "@alias",
-    imageUrl: "imgUrl"
-  };
-  const password = "password";
+  // const user: UserDto = {
+  //   firstName: "first",
+  //   lastName: "last",
+  //   alias: "@alias",
+  //   imageUrl: "imgUrl"
+  // };
+  // const password = "password";
 
   // const authToken: AuthTokenDto = await authService.createAuthToken(user, password);
   // console.log(JSON.stringify(authToken))
@@ -246,6 +250,48 @@ const main = async () => {
 
   // console.log(await authService.renewAuthTokenTimestamp("0c9dbf28-4c86-4f59-a76a-0adcdd30eb0b"));
   // await authService.verifyAuthenticatedUser("0c9dbf28-4c86-4f59-a76a-0adcdd30eb0b", user.alias);
+
+  // console.log(await authService.isAuthTokenActive("0c9dbf28-4c86-4f59-a76a-0adcdd30eb0b"));
+  // console.log(await authService.renewAuthTokenTimestamp("0c9dbf28-4c86-4f59-a76a-0adcdd30eb0b"));
+
+  // const [followers, hasMorePages] = await followService.loadMoreFollowers("token", "@alias", 15, null);
+  // console.log(
+  //   "@alias is followed by: " +
+  //   JSON.stringify(followers) +
+  //   ", and are there more pages? " +
+  //   hasMorePages
+  // );
+
+  // const lastFollower = followers[followers.length - 1];
+
+  // const [followers2, hasMorePages2] = await followService.loadMoreFollowers("token", "@alias", 15, lastFollower);
+  // console.log(
+  //   "@alias is also followed by: " +
+  //   JSON.stringify(followers2) +
+  //   ", and are there more pages? " +
+  //   hasMorePages2
+  // );
+
+  // const [followees, hasMorePages] = await followService.loadMoreFollowees("token", "@alias", 15, null);
+  // console.log(
+  //   "@alias follows: " +
+  //   JSON.stringify(followees) +
+  //   ", and are there more pages? " +
+  //   hasMorePages
+  // );
+
+  // const lastFollowee = followees[followees.length - 1];
+
+  // const [followees2, hasMorePages2] = await followService.loadMoreFollowees("token", "@alias", 15, lastFollowee);
+  // console.log(
+  //   "@alias also follows: " +
+  //   JSON.stringify(followees2) +
+  //   ", and are there more pages? " +
+  //   hasMorePages2
+  // );
+
+  
+
 }
 
 main()
