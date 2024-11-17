@@ -73,17 +73,28 @@ export class AuthService {
    */
   public async verifyAuthenticatedUser(token: string, alias: string): Promise<void> {
     await doFailureReportingOperation(async () => {
-      const [actualUser, timestamp] = await this._authDao.getAuthenticatedUser(token);
+      const [actualUser, timestamp] = await this._authDao.getUser(token);
       if (alias !== actualUser.alias) {
         throw new Error("Alias doesn't match the alias of the user associated with the token");
       }
 
-      if (!this.isTimestampValid(timestamp)) {
-        throw new Error(`Token has expired. Current token lifespan is ${this._timestampDuration} milliseconds.`)
-      }
+      this.assertNotTimedOut(timestamp);
     },
       "AuthService",
       "verifyAuthenticatedUser"
+    );
+  }
+
+  public async getUserFromToken(token: string): Promise<UserDto> {
+    return await doFailureReportingOperation(async () => {
+      const [user, timestamp] = await this._authDao.getUser(token);
+
+      this.assertNotTimedOut(timestamp);
+
+      return user;
+    },
+      "AuthService",
+      "getAuthenticatedUser"
     );
   }
 
@@ -104,14 +115,14 @@ export class AuthService {
     );
   }
 
-  public async isAuthTokenActive(token: string): Promise<boolean> { // FIXME CHANGE TO PRIVATE
+  public async isAuthTokenActive(token: string): Promise<boolean> {
     return doFailureReportingOperation(async () => {
       const timestamp: number | null = await this._authDao.getTimestamp_Soft(token);
       if (timestamp == null) {
         return false;
       }
 
-      return this.isTimestampValid(timestamp);
+      return this.isTimestampActive(timestamp);
     },
       "AuthService",
       "isAuthTokenActive"
@@ -136,7 +147,16 @@ export class AuthService {
   /**
    * Timestamp is valid for as many milliseconds as specified in this._timestampDuration
    */
-  private isTimestampValid(timestamp: number): boolean {
+  private isTimestampActive(timestamp: number): boolean {
     return Date.now() - timestamp <= this._timestampDuration;
+  }
+
+  /**
+   * Throws an error if the timestamp is expired
+   */
+  private assertNotTimedOut(timestamp: number): void {
+    if (!this.isTimestampActive(timestamp)) {
+      throw new Error(`Token has expired. Current token lifespan is ${this._timestampDuration} milliseconds.`)
+    }
   }
 }

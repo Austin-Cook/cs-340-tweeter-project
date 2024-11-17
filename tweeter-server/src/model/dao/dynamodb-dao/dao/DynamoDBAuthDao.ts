@@ -54,7 +54,7 @@ export class DynamoDBAuthDao implements AuthDao {
     )
   }
 
-  public async getAuthenticatedUser(token: string): Promise<[UserDto, number]> {
+  public async getUser(token: string): Promise<[UserDto, number]> {
     return await doFailureReportingOperation(async () => {
       const params = {
         TableName: this.tableName,

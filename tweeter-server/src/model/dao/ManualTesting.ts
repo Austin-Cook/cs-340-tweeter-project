@@ -7,6 +7,7 @@ import { AuthService } from "../service/AuthService";
 import { DynamoDBS3DaoFactory } from "./factory/DynamoDBS3DaoFactory";
 import { FollowService } from "../service/FollowService";
 import { StatusService } from "../service/StatusService";
+import { UserService } from "../service/UserService";
 
 const main = async () => {
   // const user: UserDto = {
@@ -30,6 +31,7 @@ const main = async () => {
   const authService: AuthService = new AuthService(DynamoDBS3DaoFactory.instance);
   const followService: FollowService = new FollowService(DynamoDBS3DaoFactory.instance);
   const statusService: StatusService = new StatusService(DynamoDBS3DaoFactory.instance);
+  const userService: UserService = new UserService(DynamoDBS3DaoFactory.instance);
 
   // await followDao.createFollow(user, user1);
   // console.log("Follow created");
@@ -204,7 +206,7 @@ const main = async () => {
   // const user: UserDto = {
   //   firstName: "first",
   //   lastName: "last",
-  //   alias: "@alias",
+  //   alias: "@alias2",
   //   imageUrl: "imgUrl"
   // }
 
@@ -255,6 +257,9 @@ const main = async () => {
 
   // console.log(await authService.isAuthTokenActive("0c9dbf28-4c86-4f59-a76a-0adcdd30eb0b"));
   // console.log(await authService.renewAuthTokenTimestamp("0c9dbf28-4c86-4f59-a76a-0adcdd30eb0b"));
+
+  // const user: UserDto = await authService.getUserFromToken("0c9dbf28-4c86-4f59-a76a-0adcdd30eb0b")
+  // console.log(JSON.stringify(user));
 
   // const [followers, hasMorePages] = await followService.loadMoreFollowers("token", "@alias", 15, null);
   // console.log(
@@ -340,6 +345,44 @@ const main = async () => {
   // }
 
   // await statusService.postStatus("0c9dbf28-4c86-4f59-a76a-0adcdd30eb0b", newStatus);
+
+  // const user: UserDto | null = await userService.getUser("0c9dbf28-4c86-4f59-a76a-0adcdd30eb0b_", "@alias1");
+  // console.log(JSON.stringify(user));
+
+  // const [user, authToken] = await userService.login("@alias0", "password");
+  // console.log("user", JSON.stringify(user));
+  // console.log("authToken", JSON.stringify(authToken));
+
+  // await userService.logout("18b808d4-6408-40ae-9aed-adf10e76f9d6");
+
+  // const follower: UserDto = {
+  //   firstName: "first",
+  //   lastName: "last",
+  //   alias: "@alias",
+  //   imageUrl: "imgUrl"
+  // }
+  // const followee: UserDto = {
+  //   firstName: "first",
+  //   lastName: "last",
+  //   alias: "@alias1",
+  //   imageUrl: "imgUrl"
+  // }
+  // // console.log(await userService.getIsFollowerStatus("token", follower, followee));
+  // console.log(await userService.getFolloweeCount("token", follower));
+  // console.log(await userService.getFollowerCount("token", follower));
+
+  // const user0Alias = "1c7a8936-6595-4fff-84a3-764580d63ee9";
+  // for (let i = 1; i < 6; i++) {
+  //   const user: UserDto = {
+  //     firstName: "first" + i,
+  //     lastName: "last" + i,
+  //     alias: "@alias" + i,
+  //     imageUrl: "imgUrl" + i
+  //   }
+  //   // await userDao.createUser(user, authService.hashPassword("password", user.alias));
+  //   await userService.follow(user0Alias, user)
+  //   // await userService.unfollow(user0Alias, user)
+  // }
 }
 
 main()

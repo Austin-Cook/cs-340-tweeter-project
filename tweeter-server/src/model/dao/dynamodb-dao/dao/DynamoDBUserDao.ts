@@ -16,7 +16,7 @@ export class DynamoDBUserDao implements UserDao {
 
   private readonly client: DynamoDBDocumentClient = Client.instance;
 
-  public async getUser(alias: string): Promise<UserDto> {
+  public async getUser(alias: string): Promise<UserDto | null> {
     return await doFailureReportingOperation(async () => {
       const params = {
         TableName: this.tableName,
@@ -31,7 +31,7 @@ export class DynamoDBUserDao implements UserDao {
       };
       const output = await this.client.send(new GetCommand(params));
       if (output.Item == undefined) {
-        throw new Error("User not found in database");
+        return null;
       }
       return {
         firstName: output.Item[this.firstNameAttr],
@@ -84,7 +84,16 @@ export class DynamoDBUserDao implements UserDao {
           '#aliasAttr': this.aliasAttr,
         }
       };
-      await this.client.send(new PutCommand(params));
+
+      try {
+        await this.client.send(new PutCommand(params));
+      } catch (error) {
+        if ((error as Error).name === "ConditionalCheckFailedException") {
+          throw new Error(`The user with alias: '${user.alias}' already exists`);
+        } else {
+          throw error;
+        }
+      }
     },
       "DynamoDBUserDao",
       "createUser"
@@ -107,7 +116,7 @@ export class DynamoDBUserDao implements UserDao {
       };
       const output = await this.client.send(new GetCommand(params));
       if (output.Item == undefined) {
-        throw new Error("User not found in database");
+        throw new Error(`User: '${alias}' not found in database`);
       }
       return [output.Item[this.numFollowersAttr], output.Item[this.numFolloweesAttr]];
     },

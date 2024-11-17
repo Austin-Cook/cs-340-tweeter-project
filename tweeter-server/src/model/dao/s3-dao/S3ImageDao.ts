@@ -23,7 +23,7 @@ export class S3ImageDao implements ImageDao {
           `https://${this.BUCKET}.s3.${this.REGION}.amazonaws.com/image/${fileName}`
         );
       } catch (error) {
-        throw Error("s3 put image failed with: " + error);
+        throw new Error("s3 put image failed with: " + error);
       }
     },
       "S3ImageDao",
