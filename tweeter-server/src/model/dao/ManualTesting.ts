@@ -333,18 +333,18 @@ const main = async () => {
   //   hasMorePages2
   // );
 
-  // const newStatus: StatusDto = {
-  //   post: "hello world2!",
-  //   user: {
-  //     firstName: "first",
-  //     lastName: "last",
-  //     alias: "@alias",
-  //     imageUrl: "imgUrl"
-  //   },
-  //   timestamp: Date.now()
-  // }
+  const newStatus: StatusDto = {
+    post: "hello world!",
+    user: {
+      firstName: "first",
+      lastName: "last",
+      alias: "@alias0",
+      imageUrl: "imgUrl"
+    },
+    timestamp: Date.now()
+  }
 
-  // await statusService.postStatus("0c9dbf28-4c86-4f59-a76a-0adcdd30eb0b", newStatus);
+  await statusService.postStatus("b29fe0d1-6fef-4353-b742-441cf35ee5eb", newStatus);
 
   // const user: UserDto | null = await userService.getUser("0c9dbf28-4c86-4f59-a76a-0adcdd30eb0b_", "@alias1");
   // console.log(JSON.stringify(user));
@@ -372,16 +372,26 @@ const main = async () => {
   // console.log(await userService.getFollowerCount("token", follower));
 
   // const user0Alias = "1c7a8936-6595-4fff-84a3-764580d63ee9";
+  // const followee: UserDto = {
+  //   firstName: "first",
+  //   lastName: "last",
+  //   alias: "@alias0",
+  //   imageUrl: "imgUrl"
+  // }
   // for (let i = 1; i < 6; i++) {
-  //   const user: UserDto = {
-  //     firstName: "first" + i,
-  //     lastName: "last" + i,
-  //     alias: "@alias" + i,
-  //     imageUrl: "imgUrl" + i
-  //   }
+  //   const [follower, followerAuthToken] = await userService.login("@alias" + i, "password");
+
+  //   // const user: UserDto = {
+  //   //   firstName: "first" + i,
+  //   //   lastName: "last" + i,
+  //   //   alias: "@alias" + i,
+  //   //   imageUrl: "imgUrl" + i
+  //   // }
   //   // await userDao.createUser(user, authService.hashPassword("password", user.alias));
-  //   await userService.follow(user0Alias, user)
+  //   await userService.follow(followerAuthToken.token, followee);
   //   // await userService.unfollow(user0Alias, user)
+
+  //   // await userDao.incrementNumFollowers("@alias" + i)
   // }
 }
 

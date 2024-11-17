@@ -1,6 +1,6 @@
 import { StatusDto } from "tweeter-shared";
 import { StatusDao } from "../../interface/StatusDao";
-import { DynamoDBDocumentClient, PutCommand, QueryCommandInput } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, PutCommand, QueryCommandInput, BatchWriteCommand, BatchWriteCommandInput } from "@aws-sdk/lib-dynamodb";
 import { Client } from "../DynamoDBClient";
 import { doFailureReportingOperation } from "../../../util/FailureReportingOperation";
 import { loadPagedItems } from "./util/LoadPagedItems";
@@ -94,30 +94,74 @@ export class DynamoDBStatusDao implements StatusDao {
     );
   }
 
-  public async addStatusToUsersFeed(followerAlias: string, status: StatusDto): Promise<void> {
+  public async addStatusesToUsersFeed(followerAliases: string[], status: StatusDto): Promise<void> {
     await doFailureReportingOperation(async () => {
-      const params = {
-        TableName: this.feedTableName,
-        Item: {
-          [this.followerAliasAttr]: followerAlias,
-          [this.timestampAliasAttr]: this.createTimeStampAliasValue(status.timestamp, status.user.alias),
-          [this.aliasAttr]: status.user.alias,
-          [this.timestampAttr]: status.timestamp,
-          [this.postAttr]: status.post,
-          [this.firstNameAttr]: status.user.firstName,
-          [this.lastNameAttr]: status.user.lastName,
-          [this.imageUrlAttr]: status.user.imageUrl
-        },
-        ConditionExpression: `attribute_not_exists(#followerAliasAttr) AND attribute_not_exists(#timestampAliasAttr)`,
-        ExpressionAttributeNames: {
-          '#followerAliasAttr': this.followerAliasAttr,
-          '#timestampAliasAttr': this.timestampAliasAttr,
+      if (!followerAliases || followerAliases.length == 0) {
+        // no statuses to add
+        return;
+      }
+
+      const batches: string[][] = []
+      while (followerAliases.length > 0) {
+        batches.push(followerAliases.splice(0, 25)); // Max 25 items allowed
+      }
+
+      for (const batch of batches) {
+        let unprocessedItems: Record<string, {}>[] = batch.map<Record<string, {}>>((followerAlias) => ({
+          PutRequest: {
+            Item: {
+              [this.followerAliasAttr]: followerAlias,
+              [this.timestampAliasAttr]: this.createTimeStampAliasValue(status.timestamp, status.user.alias),
+              [this.aliasAttr]: status.user.alias,
+              [this.timestampAttr]: status.timestamp,
+              [this.postAttr]: status.post,
+              [this.firstNameAttr]: status.user.firstName,
+              [this.lastNameAttr]: status.user.lastName,
+              [this.imageUrlAttr]: status.user.imageUrl
+            },
+            ConditionExpression: `attribute_not_exists(#followerAliasAttr) AND attribute_not_exists(#timestampAliasAttr)`,
+            ExpressionAttributeNames: {
+              '#followerAliasAttr': this.followerAliasAttr,
+              '#timestampAliasAttr': this.timestampAliasAttr,
+            },
+          }
+        }));
+
+        while (unprocessedItems.length > 0) {
+          const params: BatchWriteCommandInput = {
+            RequestItems: {
+              [this.feedTableName]: unprocessedItems
+            },
+          };
+
+          const result = await this.client.send(new BatchWriteCommand(params));
+
+          unprocessedItems = result.UnprocessedItems?.[this.feedTableName] || [];
         }
-      };
-      await this.client.send(new PutCommand(params));
+      }
+
+      // const params = {
+      //   TableName: this.feedTableName,
+      //   Item: {
+      //     [this.followerAliasAttr]: followerAlias,
+      //     [this.timestampAliasAttr]: this.createTimeStampAliasValue(status.timestamp, status.user.alias),
+      //     [this.aliasAttr]: status.user.alias,
+      //     [this.timestampAttr]: status.timestamp,
+      //     [this.postAttr]: status.post,
+      //     [this.firstNameAttr]: status.user.firstName,
+      //     [this.lastNameAttr]: status.user.lastName,
+      //     [this.imageUrlAttr]: status.user.imageUrl
+      //   },
+      //   ConditionExpression: `attribute_not_exists(#followerAliasAttr) AND attribute_not_exists(#timestampAliasAttr)`,
+      //   ExpressionAttributeNames: {
+      //     '#followerAliasAttr': this.followerAliasAttr,
+      //     '#timestampAliasAttr': this.timestampAliasAttr,
+      //   }
+      // };
+      // await this.client.send(new PutCommand(params));
     },
       "DynamoDBStatusDao",
-      "addStatusToUsersFeed"
+      "addStatusesToUsersFeed"
     )
   }
 

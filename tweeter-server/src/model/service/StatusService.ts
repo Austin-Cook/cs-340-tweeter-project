@@ -1,4 +1,4 @@
-import { FakeData, Status, StatusDto } from "tweeter-shared";
+import { StatusDto } from "tweeter-shared";
 import { StatusDao } from "../dao/interface/StatusDao";
 import { AuthService } from "./AuthService";
 import { DaoFactory } from "../dao/factory/DaoFactory";
@@ -59,9 +59,7 @@ export class StatusService {
 
       // add post to each follower's feed
       const followerAliases: string[] = await this._followDao.getAllFollowerAliases(newStatus.user.alias);
-      for (let i = 0; i < followerAliases.length; i++) {
-        await this._statusDao.addStatusToUsersFeed(followerAliases[i], newStatus);
-      }
+      await this._statusDao.addStatusesToUsersFeed(followerAliases, newStatus);
 
       await this._statusDao.postStatus(newStatus);
     },
