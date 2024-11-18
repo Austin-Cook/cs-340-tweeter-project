@@ -1,3 +1,3 @@
 export interface ImageDao {
-  uploadImage: (fileName: string, decodedImageBuffer: Buffer) => Promise<string>;
+  uploadImage: (fileName: string, fileExtension: string, decodedImageBuffer: Buffer) => Promise<string>;
 }

@@ -81,7 +81,7 @@ export class UserService {
       // = Buffer.from(userImageBytes).toString("base64");
       const decodedImageBuffer: Buffer = Buffer.from(userImageBase64, "base64");
 
-      const imageUrl: string = await this._imageDao.uploadImage(alias, decodedImageBuffer);
+      const imageUrl: string = await this._imageDao.uploadImage(alias, imageFileExtension, decodedImageBuffer);
 
       const user: UserDto = {
         firstName: firstName,

@@ -6,13 +6,13 @@ export class S3ImageDao implements ImageDao {
   readonly BUCKET = "tweeter-server-profile-images";
   readonly REGION = "us-west-2";
 
-  public async uploadImage(fileName: string, decodedImageBuffer: Buffer): Promise<string> {
+  public async uploadImage(fileName: string, fileExtension: string, decodedImageBuffer: Buffer): Promise<string> {
     return await doFailureReportingOperation(async () => {
       const s3Params = {
         Bucket: this.BUCKET,
-        Key: "image/" + fileName,
+        Key: "image/" + fileName + "." + fileExtension,
         Body: decodedImageBuffer,
-        ContentType: "image/png",
+        ContentType: "image/" + fileExtension,
         ACL: ObjectCannedACL.public_read,
       };
       const c = new PutObjectCommand(s3Params);
@@ -20,7 +20,7 @@ export class S3ImageDao implements ImageDao {
       try {
         await client.send(c);
         return (
-          `https://${this.BUCKET}.s3.${this.REGION}.amazonaws.com/image/${fileName}`
+          `https://${this.BUCKET}.s3.${this.REGION}.amazonaws.com/image/${fileName}.${fileExtension}`
         );
       } catch (error) {
         throw new Error("s3 put image failed with: " + error);
