@@ -9,9 +9,6 @@ export class AuthService {
   private readonly _userDao: UserDao;
   private readonly _authDao: AuthDao;
 
-  // in milliseconds
-  private readonly _timestampDuration = 3600000; // 1 hour
-
   constructor(daoFactory: DaoFactory) {
     this._userDao = daoFactory.createUserDao();
     this._authDao = daoFactory.createAuthDao();
@@ -55,7 +52,7 @@ export class AuthService {
         return false;
       }
 
-      const newTimestamp: number = AuthToken.generateTimestamp();
+      const newTimestamp: number = AuthToken.getNewExpireTime();
 
       await this._authDao.renewAuthToken(token, newTimestamp);
 
@@ -157,10 +154,10 @@ export class AuthService {
   }
 
   /**
-   * Timestamp is valid for as many milliseconds as specified in this._timestampDuration
+   * Timestamp should specify expiration time
    */
   private isTimestampActive(timestamp: number): boolean {
-    return Date.now() - timestamp <= this._timestampDuration;
+    return AuthToken.getCurrentTime_seconds() < timestamp;
   }
 
   /**
@@ -168,7 +165,7 @@ export class AuthService {
    */
   private assertNotTimedOut(timestamp: number): void {
     if (!this.isTimestampActive(timestamp)) {
-      throw new Error(`Token has expired. Current token lifespan is ${this._timestampDuration} milliseconds.`)
+      throw new Error(`Token has expired. Current token lifespan is ${AuthToken.ttl} seconds.`)
     }
   }
 }

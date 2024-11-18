@@ -1,4 +1,4 @@
-import { AuthTokenDto, StatusDto, UserDto } from "tweeter-shared"
+import { AuthToken, AuthTokenDto, StatusDto, UserDto } from "tweeter-shared"
 import { DynamoDBFollowDao } from "./model/dao/dynamodb-dao/dao/DynamoDBFollowDao"
 import { DynamoDBStatusDao } from "./model/dao/dynamodb-dao/dao/DynamoDBStatusDao";
 import { DynamoDBAuthDao } from "./model/dao/dynamodb-dao/dao/DynamoDBAuthDao";
@@ -135,7 +135,7 @@ const main = async () => {
   //     alias: "@alias3",
   //     imageUrl: "imgUrl"
   //   },
-  //   timestamp: Date.now()
+  //   timestamp: AuthToken.getCurrentTime_milliseconds()
   // }
 
   // // await statusDao.postStatus(newStatus)
@@ -334,17 +334,17 @@ const main = async () => {
   // );
 
   const newStatus: StatusDto = {
-    post: "hello world!",
+    post: "hello world! 11/18",
     user: {
       firstName: "first",
       lastName: "last",
       alias: "@alias0",
       imageUrl: "imgUrl"
     },
-    timestamp: Date.now()
+    timestamp: AuthToken.getCurrentTime_milliseconds()
   }
 
-  await statusService.postStatus("b29fe0d1-6fef-4353-b742-441cf35ee5eb", newStatus);
+  await statusService.postStatus("e2082aba-e38a-482a-b66f-97e3ba605604", newStatus);
 
   // const user: UserDto | null = await userService.getUser("0c9dbf28-4c86-4f59-a76a-0adcdd30eb0b_", "@alias1");
   // console.log(JSON.stringify(user));
@@ -393,6 +393,8 @@ const main = async () => {
 
   //   // await userDao.incrementNumFollowers("@alias" + i)
   // }
+
+  // console.log(authService.isTimestampActive(1731950775));
 }
 
 main()

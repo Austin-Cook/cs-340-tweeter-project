@@ -109,3 +109,19 @@ NOTE - YES, this is all you need to do:
 1) Run `1BuildZips.sh` to build modules and create zips
 2) Follow `3a` and `3b` above to upload the lambda layer and set the new version in the `.server` file
 3) Run `3UploadLambdasAndLayers.sh` to upload the lambdas and attach the layer to each one
+
+# Notes
+
+## Timestamps
+
+### In AuthTokens
+- In Seconds
+  - Because DynamoDB TTL requires timestamps in seconds to work
+- Represents time when it will `expire`
+  - Because DynamoDB TTL requires the timestamp is expiration time rather than creation time
+
+### In Statuses
+- In Milliseconds
+  - So the status time can be displayed precicely
+- Represents time when it was `created`
+  - So we can display creation time of status
