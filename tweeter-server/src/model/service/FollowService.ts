@@ -38,7 +38,7 @@ export class FollowService {
     return await doFailureReportingOperation(async () => {
       await this._authService.renewAuthTokenTimestamp(token);
 
-      return this._followDao.loadMoreFollowers(userAlias, pageSize, lastItem === null ? undefined : lastItem);
+      return this._followDao.loadMoreFollowees(userAlias, pageSize, lastItem === null ? undefined : lastItem);
     },
       "FollowService",
       "loadMoreFollowees"

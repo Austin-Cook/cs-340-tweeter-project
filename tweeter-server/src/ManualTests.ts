@@ -333,18 +333,18 @@ const main = async () => {
   //   hasMorePages2
   // );
 
-  const newStatus: StatusDto = {
-    post: "hello world! 11/18",
-    user: {
-      firstName: "first",
-      lastName: "last",
-      alias: "@alias0",
-      imageUrl: "imgUrl"
-    },
-    timestamp: AuthToken.getCurrentTime_milliseconds()
-  }
+  // const newStatus: StatusDto = {
+  //   post: "hello world! 11/18",
+  //   user: {
+  //     firstName: "first",
+  //     lastName: "last",
+  //     alias: "@alias0",
+  //     imageUrl: "imgUrl"
+  //   },
+  //   timestamp: AuthToken.getCurrentTime_milliseconds()
+  // }
 
-  await statusService.postStatus("e2082aba-e38a-482a-b66f-97e3ba605604", newStatus);
+  // await statusService.postStatus("e2082aba-e38a-482a-b66f-97e3ba605604", newStatus);
 
   // const user: UserDto | null = await userService.getUser("0c9dbf28-4c86-4f59-a76a-0adcdd30eb0b_", "@alias1");
   // console.log(JSON.stringify(user));

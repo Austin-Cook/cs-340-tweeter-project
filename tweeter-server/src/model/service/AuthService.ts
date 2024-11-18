@@ -35,7 +35,7 @@ export class AuthService {
       return authToken;
     },
       "AuthService",
-      "createAuthToken_Authenticated"
+      "createAuthToken"
     );
   }
 
@@ -86,12 +86,17 @@ export class AuthService {
    * Throws an error if the token isn't active
    */
   public async verifyActiveUser(token: string): Promise<void> {
-    const timestamp: number | null = await this._authDao.getTimestamp_Soft(token);
-    if (timestamp == null) {
-      throw new Error("AuthToken doesn't exist");
-    }
+    return await doFailureReportingOperation(async () => {
+      const timestamp: number | null = await this._authDao.getTimestamp_Soft(token);
+      if (timestamp == null) {
+        throw new Error("AuthToken doesn't exist");
+      }
 
-    this.assertNotTimedOut(timestamp);
+      this.assertNotTimedOut(timestamp);
+    },
+      "AuthService",
+      "verifyActiveUser"
+    );
   }
 
   public async getUserFromToken(token: string): Promise<UserDto> {
@@ -103,7 +108,7 @@ export class AuthService {
       return user;
     },
       "AuthService",
-      "getAuthenticatedUser"
+      "getUserFromToken"
     );
   }
 
