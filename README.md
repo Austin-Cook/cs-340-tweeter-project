@@ -125,3 +125,51 @@ NOTE - YES, this is all you need to do:
   - So the status time can be displayed precicely
 - Represents time when it was `created`
   - So we can display creation time of status
+
+## Tables
+### auth
+  - Partition Key: `token(S)`
+  - Sort Key: `timestamp(N)` (seconds)
+    - Used for DynamoDB TTL (must be in seconds rather than milliseconds)
+  - `user(M)`: The entire denormalized user cooresponding to the token
+### follow  
+  - Partition Key: `follower_handle(S)`
+  - Sort Key: `followee_handle(S)`
+  - `follower_first_name(S)`
+  - `follower_last_name(S)`
+  - `follower_image_url(S)`
+  - `followee_first_name(S)`
+  - `followee_last_name(S)`
+  - `followee_image_url(S)`
+  
+[INDEX in follow] followed_by
+  - Partition Key: `followee_handle(S)`
+  - Sort Key: `follower_handle(S)`
+
+### status
+  - Partition Key: `alias(S)`
+  - Sort Key: `timestamp(N)` (milliseconds)
+  - `first_name(S)`
+  - `last_name(S)`
+  - `image_url(S)`
+  - `post(S)`
+
+### feed
+  - Partition Key: `follower_alias(S)`
+  - Sort Key: `timestamp_alias(S)` string-concatenated (milliseconds)
+  - `timestamp(N)`
+  - `alias(S)`
+  - `first_name(S)`
+  - `last_name(S)`
+  - `image_url(S)`
+  - `post(S)`
+
+### user
+  - Partition Key: `alias(S)`
+  - `first_name(S)`
+  - `last_name(S)`
+  - `image_url(S)`
+  - `num_followees(N)`
+  - `num_followers(N)`
+  - `password_hash(S)`
+  
