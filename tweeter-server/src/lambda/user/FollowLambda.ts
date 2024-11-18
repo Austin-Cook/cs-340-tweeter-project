@@ -2,6 +2,7 @@ import { FollowUnfollowResponse, UserActionRequest } from "tweeter-shared"
 import { UserService } from "../../model/service/UserService";
 import { validateUser, validRequest } from "../util/ValidateInput";
 import { getMissingRequestFieldResponse, getMissingUserFieldResponse } from "../util/Error";
+import { getDaoFactory } from "../../Config";
 
 export const handler = async (request: UserActionRequest): Promise<FollowUnfollowResponse> => {
   if (!validRequest(request.token, request.user)) {
@@ -11,7 +12,7 @@ export const handler = async (request: UserActionRequest): Promise<FollowUnfollo
     return getMissingUserFieldResponse<FollowUnfollowResponse>();
   }
 
-  const userService = new UserService();
+  const userService = new UserService(getDaoFactory());
   const [followerCount, followeeCount] = await userService.follow(request.token, request.user);
 
   return {

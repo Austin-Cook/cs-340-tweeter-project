@@ -3,6 +3,7 @@ import { StatusService } from "../../model/service/StatusService";
 import { loadMorePagedItems } from "../util/LoadMorePagedItems";
 import { getMissingRequestFieldResponse, getMissingStatusFieldResponse } from "../util/Error";
 import { validateStatus, validRequest } from "../util/ValidateInput";
+import { getDaoFactory } from "../../Config";
 
 export const handler = async (request: PagedStatusItemRequest): Promise<PagedStatusItemResponse> => {
   if (!validRequest(request.token, request.userAlias, request.pageSize, request.lastItem)) {
@@ -13,7 +14,7 @@ export const handler = async (request: PagedStatusItemRequest): Promise<PagedSta
   }
 
   const getItems = async (): Promise<[StatusDto[], boolean]> => {
-    return await new StatusService().loadMoreStoryItems(request.token, request.userAlias, request.pageSize, request.lastItem);
+    return await new StatusService(getDaoFactory()).loadMoreStoryItems(request.token, request.userAlias, request.pageSize, request.lastItem);
   }
 
   return loadMorePagedItems<StatusDto, PagedStatusItemResponse>(getItems);

@@ -87,7 +87,7 @@ A new version of the lambda layer version is needed if changes are made to tweet
 
 - Open the AWS Console (in the web browers) to `Lambda`
 - Click on lambda layers
-- Click on the layer used for this project (probably called `tweeter-server` or similar)
+- Click on the layer used for this project (probably called `tweeter-server-dependencies` or similar)
 - Click to upload a new version
 - Select `Nodejs 20.x` as the compatible runtime
 - Upload `Nodejs.zip`

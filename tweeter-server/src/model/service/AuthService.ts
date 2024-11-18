@@ -85,6 +85,18 @@ export class AuthService {
     );
   }
 
+  /**
+   * Throws an error if the token isn't active
+   */
+  public async verifyActiveUser(token: string): Promise<void> {
+    const timestamp: number | null = await this._authDao.getTimestamp_Soft(token);
+    if (timestamp == null) {
+      throw new Error("AuthToken doesn't exist");
+    }
+
+    this.assertNotTimedOut(timestamp);
+  }
+
   public async getUserFromToken(token: string): Promise<UserDto> {
     return await doFailureReportingOperation(async () => {
       const [user, timestamp] = await this._authDao.getUser(token);

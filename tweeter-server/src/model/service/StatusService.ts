@@ -23,6 +23,7 @@ export class StatusService {
     lastItem: StatusDto | null
   ): Promise<[StatusDto[], boolean]> {
     return await doFailureReportingOperation(async () => {
+      await this._authService.verifyActiveUser(token);
       await this._authService.renewAuthTokenTimestamp(token);
 
       return this._statusDao.loadMoreFeedItems(userAlias, pageSize, lastItem === null ? undefined : lastItem);
@@ -39,7 +40,6 @@ export class StatusService {
     lastItem: StatusDto | null
   ): Promise<[StatusDto[], boolean]> {
     return await doFailureReportingOperation(async () => {
-      await this._authService.verifyAuthenticatedUser(token, userAlias);
       await this._authService.renewAuthTokenTimestamp(token);
 
       return this._statusDao.loadMoreStoryItems(userAlias, pageSize, lastItem === null ? undefined : lastItem);

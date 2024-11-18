@@ -2,13 +2,14 @@ import { LoginRegisterResponse, LoginRequest } from "tweeter-shared"
 import { UserService } from "../../model/service/UserService";
 import { validRequest } from "../util/ValidateInput";
 import { getMissingRequestFieldResponse } from "../util/Error";
+import { getDaoFactory } from "../../Config";
 
 export const handler = async (request: LoginRequest): Promise<LoginRegisterResponse> => {
   if (!validRequest(request.alias, request.password)) {
     return getMissingRequestFieldResponse<LoginRegisterResponse>();
   }
 
-  const userService = new UserService();
+  const userService = new UserService(getDaoFactory());
   const [user, authToken] = await userService.login(request.alias, request.password);
 
   return {

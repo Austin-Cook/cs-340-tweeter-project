@@ -1,13 +1,13 @@
 import { AuthTokenDto, StatusDto, UserDto } from "tweeter-shared"
-import { DynamoDBFollowDao } from "./dynamodb-dao/dao/DynamoDBFollowDao"
-import { DynamoDBStatusDao } from "./dynamodb-dao/dao/DynamoDBStatusDao";
-import { DynamoDBAuthDao } from "./dynamodb-dao/dao/DynamoDBAuthDao";
-import { DynamoDBUserDao } from "./dynamodb-dao/dao/DynamoDBUserDao";
-import { AuthService } from "../service/AuthService";
-import { DynamoDBS3DaoFactory } from "./factory/DynamoDBS3DaoFactory";
-import { FollowService } from "../service/FollowService";
-import { StatusService } from "../service/StatusService";
-import { UserService } from "../service/UserService";
+import { DynamoDBFollowDao } from "./model/dao/dynamodb-dao/dao/DynamoDBFollowDao"
+import { DynamoDBStatusDao } from "./model/dao/dynamodb-dao/dao/DynamoDBStatusDao";
+import { DynamoDBAuthDao } from "./model/dao/dynamodb-dao/dao/DynamoDBAuthDao";
+import { DynamoDBUserDao } from "./model/dao/dynamodb-dao/dao/DynamoDBUserDao";
+import { AuthService } from "./model/service/AuthService";
+import { DynamoDBS3DaoFactory } from "./model/dao/factory/DynamoDBS3DaoFactory";
+import { FollowService } from "./model/service/FollowService";
+import { StatusService } from "./model/service/StatusService";
+import { UserService } from "./model/service/UserService";
 
 const main = async () => {
   // const user: UserDto = {

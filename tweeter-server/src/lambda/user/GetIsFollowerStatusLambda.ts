@@ -2,6 +2,7 @@ import { GetIsFollowerStatusRequest, GetIsFollowerStatusResponse } from "tweeter
 import { UserService } from "../../model/service/UserService";
 import { validateUser, validRequest } from "../util/ValidateInput";
 import { getMissingRequestFieldResponse, getMissingUserFieldResponse } from "../util/Error";
+import { getDaoFactory } from "../../Config";
 
 export const handler = async (request: GetIsFollowerStatusRequest): Promise<GetIsFollowerStatusResponse> => {
   if (!validRequest(request.token, request.user, request.selectedUser)) {
@@ -11,7 +12,7 @@ export const handler = async (request: GetIsFollowerStatusRequest): Promise<GetI
     return getMissingUserFieldResponse<GetIsFollowerStatusResponse>();
   }
 
-  const userService = new UserService();
+  const userService = new UserService(getDaoFactory());
   const isFollower = await userService.getIsFollowerStatus(request.token, request.user, request.selectedUser);
 
   return {
