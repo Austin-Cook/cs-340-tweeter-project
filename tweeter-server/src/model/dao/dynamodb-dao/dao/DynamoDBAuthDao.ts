@@ -5,7 +5,13 @@ import { DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCo
 import { Client } from "../DynamoDBClient";
 
 export class DynamoDBAuthDao implements AuthDao {
-  readonly tableName = "auth"; // Partition: token(S), Attrs: timestamp(N), alias(S)
+  /**
+   * Partition: token(S)
+   * timestamp(N)
+   * user(M)
+   */
+  readonly tableName = "auth";
+
   readonly tokenAttr = "token";
   readonly timestampAttr = "timestamp";
   readonly userAttr = "user";

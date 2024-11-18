@@ -16,14 +16,38 @@ interface StatusDBRow {
 }
 
 export class DynamoDBStatusDao implements StatusDao {
-  readonly statusTableName = "status"; // Partition: alias(S), Sort: timestamp(N), Attrs: post(S), firstName(S), lastName(S), imgUrl(S)
+  /**
+   * Story - User views their own posts
+   * 
+   * Partition Key: alias(S)
+   * Sort Key: timestamp(N) (milliseconds)
+   * first_name(S)
+   * last_name(S)
+   * image_url(S)
+   * post(S)
+   */
+  readonly statusTableName = "status";
+
+  /**
+   * Feed - User views their followees' posts
+   * 
+   * Partition: follower_alias(S)
+   * Sort: timestamp_alias(S) string-concatenated (milliseconds)
+   * timestamp(N)
+   * alias(S)
+   * first_name(S)
+   * last_name(S)
+   * image_url(S)
+   * post(S)
+   */
+  readonly feedTableName = "feed";
+
   readonly aliasAttr = "alias";
   readonly timestampAttr = "timestamp";
   readonly postAttr = "post";
   readonly firstNameAttr = "first_name";
   readonly lastNameAttr = "last_name";
   readonly imageUrlAttr = "image_url";
-  readonly feedTableName = "feed"; // Partition: follower_alias(S), Sort: timestamp, Attrs: alias(S), post(S), firstName(S), lastName(S), imgUrl(S)
   readonly followerAliasAttr = "follower_alias";
   readonly timestampAliasAttr = "timestamp_alias";
 

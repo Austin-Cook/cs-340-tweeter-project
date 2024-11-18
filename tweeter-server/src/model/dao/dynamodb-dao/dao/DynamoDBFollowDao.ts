@@ -27,8 +27,28 @@ interface FolloweeDBRow {
 }
 
 export class DynamoDBFollowDao implements FollowDao {
-  readonly tableName = "follow"; // a -> follows -> b
-  readonly indexName = "followed_by"; // a -> followed by -> b
+  /**
+   * a -> follows -> b
+   * 
+   * Partition: follower_handle(S)
+   * Sort: followee_handle(S)
+   * follower_first_name(S)
+   * follower_last_name(S)
+   * follower_image_url(S)
+   * followee_first_name(S)
+   * followee_last_name(S)
+   * followee_image_url(S)
+   */
+  readonly tableName = "follow";
+
+  /**
+   * a -> followed by -> b
+   * 
+   * Partition: followee_handle(S)
+   * Sort: follower_handle(S)
+   */
+  readonly indexName = "followed_by";
+
   readonly followerHandleAttr = "follower_handle";
   readonly followeeHandleAttr = "followee_handle";
   readonly followerFirstNameAttr = "follower_first_name";

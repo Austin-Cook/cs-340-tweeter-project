@@ -5,7 +5,17 @@ import { Client } from "../DynamoDBClient";
 import { doFailureReportingOperation } from "../../../util/FailureReportingOperation";
 
 export class DynamoDBUserDao implements UserDao {
-  readonly tableName = "user"; // Partition: token(S), Attrs: timestamp(N), alias(S)
+  /**
+   * Partition Key: alias(S)
+   * first_name(S)
+   * last_name(S)
+   * image_url(S)
+   * num_followees(N)
+   * num_followers(N)
+   * password_hash(S)
+   */
+  readonly tableName = "user";
+
   readonly aliasAttr = "alias";
   readonly firstNameAttr = "first_name";
   readonly lastNameAttr = "last_name";
