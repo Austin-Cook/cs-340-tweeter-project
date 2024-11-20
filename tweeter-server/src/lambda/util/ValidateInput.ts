@@ -1,18 +1,39 @@
 import { StatusDto } from "tweeter-shared";
+import { getMissingRequestFieldMessage, getMissingStatusFieldMessage, getMissingUserFieldMessage } from "./Error";
 
-export const validRequest = (...inputItems: any): boolean => {
+export const validateRequest = (...inputItems: any): void => {
   for (let i = 0; i < inputItems.length; i++) {
     if (inputItems[i] === undefined) {
-      return false;
+      throw new Error(getMissingRequestFieldMessage());
     }
   }
-  return true;
-}
+};
 
-export const validateUser = (user: any): boolean => {
-  return user.firstName != null && user.lastName != null && user.alias != null && user.imageUrl != null;
-}
+export const validateUser = (user: any): void => {
+  if (user.firstName == null || user.lastName == null || user.alias == null || user.imageUrl == null) {
+    throw new Error(getMissingUserFieldMessage());
+  }
+};
 
-export const validateStatus = (status: StatusDto): boolean => {
-  return status.post != null && status.user != null && validateUser(status.user) && status.timestamp != null;
-}
+export const validateUser_MayBeNull = (user: any): void => {
+  if (user == null) {
+    return;
+  }
+
+  validateUser(user);
+};
+
+export const validateStatus = (status: StatusDto): void => {
+  if (status.post == null || status.user == null || status.timestamp == null) {
+    throw new Error(getMissingStatusFieldMessage());
+  }
+  validateUser(status.user);
+};
+
+export const validateStatus_MayBeNull = (status: StatusDto | null): void => {
+  if (status == null) {
+    return;
+  }
+
+  validateStatus(status);
+};

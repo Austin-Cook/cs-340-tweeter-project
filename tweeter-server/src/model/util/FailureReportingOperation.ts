@@ -23,5 +23,5 @@ export const doFailureReportingOperation_Sync = <RET>(
 }
 
 const getError = (error: Error, daoName: string, daoMethod: string): Error => {
-  return new Error(`\n[${daoName}.${daoMethod}()] failed because of exception: ${(error as Error).message}`)
+  return new Error(`[${daoName}.${daoMethod}()] failed because of exception: ${(error as Error).message}`)
 }

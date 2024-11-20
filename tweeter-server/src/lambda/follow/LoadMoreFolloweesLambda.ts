@@ -1,18 +1,14 @@
 import { PagedUserItemRequest, PagedUserItemResponse, UserDto } from "tweeter-shared";
 import { loadMorePagedItems } from "../util/LoadMorePagedItems";
 import { FollowService } from "../../model/service/FollowService";
-import { validateUser, validRequest } from "../util/ValidateInput";
-import { getMissingRequestFieldResponse, getMissingUserFieldResponse, returnErrorResponseOnFailure } from "../util/Error";
+import { validateRequest, validateUser_MayBeNull } from "../util/ValidateInput";
+import { throwBadRequestErrorOnFailure } from "../util/Error";
 import { getDaoFactory } from "../../Config";
 
 export const handler = async (request: PagedUserItemRequest): Promise<PagedUserItemResponse> => {
-  return await returnErrorResponseOnFailure(async () => {
-    if (!validRequest(request.token, request.userAlias, request.pageSize, request.lastItem)) {
-      return getMissingRequestFieldResponse<PagedUserItemResponse>();
-    }
-    if (request.lastItem != null && !validateUser(request.lastItem)) {
-      return getMissingUserFieldResponse<PagedUserItemResponse>();
-    }
+  return await throwBadRequestErrorOnFailure(async () => {
+    validateRequest(request.token, request.userAlias, request.pageSize, request.lastItem);
+    validateUser_MayBeNull(request.lastItem);
 
     const getItems = async (): Promise<[UserDto[], boolean]> => {
       return await new FollowService(getDaoFactory()).loadMoreFollowees(request.token, request.userAlias, request.pageSize, request.lastItem);

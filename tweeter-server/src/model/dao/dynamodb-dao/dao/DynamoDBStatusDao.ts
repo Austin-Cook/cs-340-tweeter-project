@@ -163,26 +163,6 @@ export class DynamoDBStatusDao implements StatusDao {
           unprocessedItems = result.UnprocessedItems?.[this.feedTableName] || [];
         }
       }
-
-      // const params = {
-      //   TableName: this.feedTableName,
-      //   Item: {
-      //     [this.followerAliasAttr]: followerAlias,
-      //     [this.timestampAliasAttr]: this.createTimeStampAliasValue(status.timestamp, status.user.alias),
-      //     [this.aliasAttr]: status.user.alias,
-      //     [this.timestampAttr]: status.timestamp,
-      //     [this.postAttr]: status.post,
-      //     [this.firstNameAttr]: status.user.firstName,
-      //     [this.lastNameAttr]: status.user.lastName,
-      //     [this.imageUrlAttr]: status.user.imageUrl
-      //   },
-      //   ConditionExpression: `attribute_not_exists(#followerAliasAttr) AND attribute_not_exists(#timestampAliasAttr)`,
-      //   ExpressionAttributeNames: {
-      //     '#followerAliasAttr': this.followerAliasAttr,
-      //     '#timestampAliasAttr': this.timestampAliasAttr,
-      //   }
-      // };
-      // await this.client.send(new PutCommand(params));
     },
       "DynamoDBStatusDao",
       "addStatusesToUsersFeed"
