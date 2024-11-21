@@ -87,7 +87,7 @@ A new version of the lambda layer version is needed if changes are made to tweet
 
 - Open the AWS Console (in the web browers) to `Lambda`
 - Click on lambda layers
-- Click on the layer used for this project (probably called `tweeter-server` or similar)
+- Click on the layer used for this project (probably called `tweeter-server-dependencies` or similar)
 - Click to upload a new version
 - Select `Nodejs 20.x` as the compatible runtime
 - Upload `Nodejs.zip`
@@ -109,3 +109,67 @@ NOTE - YES, this is all you need to do:
 1) Run `1BuildZips.sh` to build modules and create zips
 2) Follow `3a` and `3b` above to upload the lambda layer and set the new version in the `.server` file
 3) Run `3UploadLambdasAndLayers.sh` to upload the lambdas and attach the layer to each one
+
+# Notes
+
+## Timestamps
+
+### In AuthTokens
+- In Seconds
+  - Because DynamoDB TTL requires timestamps in seconds to work
+- Represents time when it will `expire`
+  - Because DynamoDB TTL requires the timestamp is expiration time rather than creation time
+
+### In Statuses
+- In Milliseconds
+  - So the status time can be displayed precicely
+- Represents time when it was `created`
+  - So we can display creation time of status
+
+## Tables
+### auth
+  - Partition Key: `token(S)`
+  - Sort Key: `timestamp(N)` (seconds)
+    - Used for DynamoDB TTL (must be in seconds rather than milliseconds)
+  - `user(M)`: The entire denormalized user cooresponding to the token
+### follow  
+  - Partition Key: `follower_handle(S)`
+  - Sort Key: `followee_handle(S)`
+  - `follower_first_name(S)`
+  - `follower_last_name(S)`
+  - `follower_image_url(S)`
+  - `followee_first_name(S)`
+  - `followee_last_name(S)`
+  - `followee_image_url(S)`
+  
+[INDEX in follow] followed_by
+  - Partition Key: `followee_handle(S)`
+  - Sort Key: `follower_handle(S)`
+
+### status
+  - Partition Key: `alias(S)`
+  - Sort Key: `timestamp(N)` (milliseconds)
+  - `first_name(S)`
+  - `last_name(S)`
+  - `image_url(S)`
+  - `post(S)`
+
+### feed
+  - Partition Key: `follower_alias(S)`
+  - Sort Key: `timestamp_alias(S)` string-concatenated (milliseconds)
+  - `timestamp(N)`
+  - `alias(S)`
+  - `first_name(S)`
+  - `last_name(S)`
+  - `image_url(S)`
+  - `post(S)`
+
+### user
+  - Partition Key: `alias(S)`
+  - `first_name(S)`
+  - `last_name(S)`
+  - `image_url(S)`
+  - `num_followees(N)`
+  - `num_followers(N)`
+  - `password_hash(S)`
+  
