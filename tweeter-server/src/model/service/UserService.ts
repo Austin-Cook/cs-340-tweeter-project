@@ -1,35 +1,71 @@
 import { Buffer } from "buffer";
-import { AuthTokenDto, FakeData, UserDto } from "tweeter-shared";
+import { AuthTokenDto, UserDto } from "tweeter-shared";
+import { AuthService } from "./AuthService";
+import { IUserDao } from "../dao/interface/IUserDao";
+import { IDaoFactory } from "../dao/factory/IDaoFactory";
+import { doFailureReportingOperation } from "../util/FailureReportingOperation";
+import { IAuthDao } from "../dao/interface/IAuthDao";
+import { IImageDao } from "../dao/interface/IImageDao";
+import { IFollowDao } from "../dao/interface/IFollowDao";
 
 export class UserService {
+  private readonly _userDao: IUserDao;
+  private readonly _imageDao: IImageDao;
+  private readonly _authDao: IAuthDao;
+  private readonly _followDao: IFollowDao;
+  private readonly _authService: AuthService;
+
+  constructor(daoFactory: IDaoFactory) {
+    this._userDao = daoFactory.createUserDao();
+    this._imageDao = daoFactory.createImageDao();
+    this._authDao = daoFactory.createAuthDao();
+    this._followDao = daoFactory.createFollowDao();
+    this._authService = new AuthService(daoFactory);
+  }
+
   public async getUser(
     token: string,
     alias: string
   ): Promise<UserDto | null> {
-    const user = FakeData.instance.findUserByAlias(alias);
-    const userDto: UserDto | null = user == null ? null : user.dto;
+    return await doFailureReportingOperation(async () => {
+      await this._authService.renewAuthTokenTimestamp(token);
 
-    return userDto;
+      return this._userDao.getUser(alias);
+    },
+      "UserService",
+      "getUser"
+    );
   };
 
   public async login(
     alias: string,
     password: string
   ): Promise<[UserDto, AuthTokenDto]> {
-    const user = FakeData.instance.firstUser;
+    return await doFailureReportingOperation(async () => {
+      // get the user
+      const user: UserDto | null = await this._userDao.getUser(alias);
+      if (user == null) {
+        throw new Error(`User with alias: '${alias}' does not exist`);
+      }
 
-    if (user === null) {
-      throw new Error("Invalid alias or password");
-    }
+      // authenticate password
+      // generate authToken and save it to db
+      const authToken: AuthTokenDto = await this._authService.createAuthToken(user, password);
 
-    return [user.dto, FakeData.instance.authToken.dto];
+      return [user, authToken];
+    },
+      "UserService",
+      "login"
+    );
   };
 
   public async logout(token: string): Promise<void> {
-    // Pause so we can see the logging out message. Delete when the call to the server is implemented.
-    await new Promise((res) => setTimeout(res, 1000));
-
-    // TODO: Log the user out
+    await doFailureReportingOperation(async () => {
+      await this._authDao.revokeToken(token);
+    },
+      "UserService",
+      "logout"
+    );
   };
 
   public async register(
@@ -40,19 +76,30 @@ export class UserService {
     userImageBase64: string,
     imageFileExtension: string
   ): Promise<[UserDto, AuthTokenDto]> {
-    // // Originally: userImageBytes: Uint8Array,
-    // // Not neded now, but will be needed when you make the request to the server in milestone 3
-    // const imageStringBase64: string =
-    //   Buffer.from(userImageBytes).toString("base64");
+    return await doFailureReportingOperation(async () => {
+      // originally converted to base64 with const imageStringBase64: string
+      // = Buffer.from(userImageBytes).toString("base64");
+      const decodedImageBuffer: Buffer = Buffer.from(userImageBase64, "base64");
 
-    // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
+      const imageUrl: string = await this._imageDao.uploadImage(alias, imageFileExtension, decodedImageBuffer);
 
-    if (user === null) {
-      throw new Error("Invalid registration");
-    }
+      const user: UserDto = {
+        firstName: firstName,
+        lastName: lastName,
+        alias: alias,
+        imageUrl: imageUrl
+      }
+      const passwordHash: string = this._authService.hashPassword(password, alias);
 
-    return [user.dto, FakeData.instance.authToken.dto];
+      await this._userDao.createUser(user, passwordHash);
+
+      const authToken = await this._authService.createAuthToken(user, password);
+
+      return [user, authToken];
+    },
+      "UserService",
+      "register"
+    );
   };
 
   public async getIsFollowerStatus(
@@ -60,53 +107,96 @@ export class UserService {
     user: UserDto,
     selectedUser: UserDto
   ): Promise<boolean> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.isFollower();
+    return await doFailureReportingOperation(async () => {
+      await this._authService.renewAuthTokenTimestamp(token);
+
+      return this._followDao.isFollower(user.alias, selectedUser.alias);
+    },
+      "UserService",
+      "getIsFollowerStatus"
+    );
   };
 
   public async getFolloweeCount(
     token: string,
     user: UserDto
   ): Promise<number> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getFolloweeCount(user.alias);
+    return await doFailureReportingOperation(async () => {
+      await this._authService.renewAuthTokenTimestamp(token);
+
+      const [followerCount, followeeCount] = await this._userDao.getFollowCounts(user.alias);
+      return followeeCount;
+    },
+      "UserService",
+      "getFolloweeCount"
+    );
   };
 
   public async getFollowerCount(
     token: string,
     user: UserDto
   ): Promise<number> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getFollowerCount(user.alias);
+    return await doFailureReportingOperation(async () => {
+      await this._authService.renewAuthTokenTimestamp(token);
+
+      const [followerCount, followeeCount] = await this._userDao.getFollowCounts(user.alias);
+
+      return followerCount;
+    },
+      "UserService",
+      "getFollowerCount"
+    );
   };
 
   public async follow(
     token: string,
     userToFollow: UserDto
   ): Promise<[followerCount: number, followeeCount: number]> {
-    // Pause so we can see the follow message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
+    return await doFailureReportingOperation(async () => {
+      await this._authService.renewAuthTokenTimestamp(token);
 
-    // TODO: Call the server
+      const follower = await this._authService.getUserFromToken(token);
+      if (follower.alias == userToFollow.alias) {
+        throw new Error("A user can't follow themself")
+      }
 
-    const followerCount = await this.getFollowerCount(token, userToFollow);
-    const followeeCount = await this.getFolloweeCount(token, userToFollow);
+      await this._followDao.createFollow(follower, userToFollow);
+      await this._userDao.incrementNumFollowees(follower.alias);
+      await this._userDao.incrementNumFollowers(userToFollow.alias);
 
-    return [followerCount, followeeCount];
+      const followerCount = await this.getFollowerCount(token, userToFollow);
+      const followeeCount = await this.getFolloweeCount(token, userToFollow);
+
+      return [followerCount, followeeCount];
+    },
+      "UserService",
+      "follow"
+    );
   };
 
   public async unfollow(
     token: string,
     userToUnfollow: UserDto
   ): Promise<[followerCount: number, followeeCount: number]> {
-    // Pause so we can see the unfollow message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
+    return await doFailureReportingOperation(async () => {
+      await this._authService.renewAuthTokenTimestamp(token);
 
-    // TODO: Call the server
+      const follower = await this._authService.getUserFromToken(token);
+      if (follower.alias == userToUnfollow.alias) {
+        throw new Error("A user can't unfollow themself")
+      }
 
-    const followerCount = await this.getFollowerCount(token, userToUnfollow);
-    const followeeCount = await this.getFolloweeCount(token, userToUnfollow);
+      await this._followDao.removeFollow(follower.alias, userToUnfollow.alias);
+      await this._userDao.decrementNumFollowees(follower.alias);
+      await this._userDao.decrementNumFollowers(userToUnfollow.alias);
 
-    return [followerCount, followeeCount];
+      const followerCount = await this.getFollowerCount(token, userToUnfollow);
+      const followeeCount = await this.getFolloweeCount(token, userToUnfollow);
+
+      return [followerCount, followeeCount];
+    },
+      "UserService",
+      "unfollow"
+    );
   };
 }
