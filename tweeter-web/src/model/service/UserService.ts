@@ -108,7 +108,7 @@ export class UserService {
     authToken: AuthToken,
     userToUnfollow: User
   ): Promise<[followerCount: number, followeeCount: number]> {
-    return await ServerFacade.instance.follow_Server({
+    return await ServerFacade.instance.unfollow_Server({
       token: authToken.token,
       user: userToUnfollow.dto
     })
