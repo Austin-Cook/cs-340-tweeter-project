@@ -1,19 +1,22 @@
 import { LogoutRequest } from "tweeter-shared"
 import { UserService } from "../../model/service/UserService";
 import { TweeterResponse } from "tweeter-shared/dist/model/net/response/TweeterResponse";
-import { validRequest } from "../util/ValidateInput";
-import { getMissingRequestFieldResponse } from "../util/Error";
+import { validateRequest } from "../util/ValidateInput";
+import { throwBadRequestErrorOnFailure } from "../util/Error";
+import { getDaoFactory } from "../../Config";
 
 export const handler = async (request: LogoutRequest): Promise<TweeterResponse> => {
-  if (!validRequest(request.token)) {
-    return getMissingRequestFieldResponse<TweeterResponse>();
-  }
+  return await throwBadRequestErrorOnFailure(async () => {
+    validateRequest(request.token);
 
-  const userService = new UserService();
-  await userService.logout(request.token);
+    const userService = new UserService(getDaoFactory());
+    await userService.logout(request.token);
 
-  return {
-    success: true,
-    message: null
-  }
+    return {
+      success: true,
+      message: null
+    }
+  },
+    "LogoutLambda"
+  );
 }

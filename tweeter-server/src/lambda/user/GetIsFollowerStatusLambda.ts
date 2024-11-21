@@ -1,22 +1,24 @@
 import { GetIsFollowerStatusRequest, GetIsFollowerStatusResponse } from "tweeter-shared"
 import { UserService } from "../../model/service/UserService";
-import { validateUser, validRequest } from "../util/ValidateInput";
-import { getMissingRequestFieldResponse, getMissingUserFieldResponse } from "../util/Error";
+import { validateRequest, validateUser } from "../util/ValidateInput";
+import { throwBadRequestErrorOnFailure } from "../util/Error";
+import { getDaoFactory } from "../../Config";
 
 export const handler = async (request: GetIsFollowerStatusRequest): Promise<GetIsFollowerStatusResponse> => {
-  if (!validRequest(request.token, request.user, request.selectedUser)) {
-    return getMissingRequestFieldResponse<GetIsFollowerStatusResponse>();
-  }
-  if (!validateUser(request.user) || !validateUser(request.selectedUser)) {
-    return getMissingUserFieldResponse<GetIsFollowerStatusResponse>();
-  }
+  return await throwBadRequestErrorOnFailure(async () => {
+    validateRequest(request.token, request.user, request.selectedUser);
+    validateUser(request.user);
+    validateUser(request.selectedUser);
 
-  const userService = new UserService();
-  const isFollower = await userService.getIsFollowerStatus(request.token, request.user, request.selectedUser);
+    const userService = new UserService(getDaoFactory());
+    const isFollower = await userService.getIsFollowerStatus(request.token, request.user, request.selectedUser);
 
-  return {
-    success: true,
-    message: null,
-    isFollower: isFollower
-  }
+    return {
+      success: true,
+      message: null,
+      isFollower: isFollower
+    }
+  },
+    "GetIsFollowerStatusLambda"
+  );
 }

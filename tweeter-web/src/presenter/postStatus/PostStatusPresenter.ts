@@ -29,7 +29,7 @@ export class PostStatusPresenter extends Presenter<PostStatusView> {
         this.view.setIsLoading(true);
         this.view.displayInfoMessage("Posting status...", 0);
 
-        const status = new Status(post, currentUser!, Date.now());
+        const status = new Status(post, currentUser!, AuthToken.getCurrentTime_milliseconds());
 
         await this.statusService.postStatus(authToken!, status);
 

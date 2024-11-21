@@ -4,10 +4,34 @@ export class AuthToken {
   private _token: string;
   private _timestamp: number;
 
+  /**
+   * The lifespan of a token, in seconds
+   */
+  private static readonly _ttl: number = 3600; // 1 hour
+
   public static Generate(): AuthToken {
     const token: string = AuthToken.generateToken();
-    const timestamp: number = Date.now();
+    const timestamp: number = this.getNewExpireTime();
     return new AuthToken(token, timestamp);
+  }
+
+  public static get ttl() {
+    return this._ttl;
+  }
+
+  /**
+   * @returns (current_time + TTL) in seconds
+   */
+  public static getNewExpireTime(): number {
+    return this.getCurrentTime_seconds() + this._ttl;
+  }
+
+  public static getCurrentTime_milliseconds(): number {
+    return Date.now();
+  }
+
+  public static getCurrentTime_seconds(): number {
+    return Math.floor(this.getCurrentTime_milliseconds() / 1000);
   }
 
   private static generateToken(): string {
