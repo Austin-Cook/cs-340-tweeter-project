@@ -30,6 +30,8 @@ export type { LogoutRequest } from "./model/net/request/LogoutRequest";
 export type { RegisterRequest } from "./model/net/request/RegisterRequest";
 export type { GetIsFollowerStatusRequest } from "./model/net/request/GetIsFollowerStatusRequest";
 export type { UserActionRequest } from "./model/net/request/UserActionRequest";
+export type { UpdateFeedRequest } from "./model/net/request/UpdateFeedRequest";
+export type { PostUpdateFeedRequest } from "./model/net/request/PostUpdateFeedRequest";
 
 //
 // Responses
