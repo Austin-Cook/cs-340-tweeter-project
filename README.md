@@ -81,7 +81,7 @@ NOTE - This entire step (1) is automated by running `1BuildZips.sh`
 
 ### 3) Update Lambda layer If Needed
 
-A new version of the lambda layer version is needed if changes are made to tweeter-shared or helper files in tweeter-server
+A new version of the lambda layer version is needed if changes are made to tweeter-shared or dependencies of tweeter-server
 
 3a. Manually upload `Nodejs.zip` to the AWS Console
 

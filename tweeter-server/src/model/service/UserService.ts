@@ -102,6 +102,30 @@ export class UserService {
     );
   };
 
+
+  /**
+   * Used for testing
+   * 
+   * Password is "password" for all users
+   */
+  public async bulkRegister(
+    users: UserDto[]
+  ): Promise<void> {
+    await doFailureReportingOperation(async () => {
+      const passwordHashes: string[] = [];
+      for (const user of users) {
+        const passwordHash: string = this._authService.hashPassword("password", user.alias);
+
+        passwordHashes.push(passwordHash);
+      }
+
+      await this._userDao.bulkCreateUsers(users, passwordHashes);
+    },
+      "UserService",
+      "bulkRegister"
+    );
+  };
+
   public async getIsFollowerStatus(
     token: string,
     user: UserDto,

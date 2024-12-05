@@ -1,6 +1,6 @@
 import { UserDto } from "tweeter-shared";
 import { IUserDao } from "../interface/IUserDao";
-import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { BatchWriteCommand, BatchWriteCommandInput, DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { Client } from "./client/DynamoDBClient";
 import { doFailureReportingOperation } from "../../util/FailureReportingOperation";
 
@@ -132,6 +132,68 @@ export class DynamoDBUserDao implements IUserDao {
     },
       "DynamoDBUserDao",
       "getFollowCounts"
+    );
+  }
+
+  /**
+   * Used for testing
+   */
+  public async bulkCreateUsers(users: UserDto[], passwordHashes: string[]) {
+    await doFailureReportingOperation(async () => {
+      if (users.length != passwordHashes.length) {
+        throw new Error("Different number of users and passwordHashes");
+      }
+
+      if (!users || users.length == 0) {
+        // no users to add
+        return;
+      }
+
+      const batchSize = 25;
+
+      const batches: [UserDto, string][][] = []
+      while (users.length > 0) {
+        const batchUsers = users.splice(0, batchSize);
+        const batchPasswordHashes = passwordHashes.splice(0, batchSize);
+
+        const batch: [UserDto, string][] = []
+        for (let i = 0; i < batchUsers.length; i++) {
+          batch.push([batchUsers[i], batchPasswordHashes[i]]);
+        }
+
+        batches.push(batch); // Max 25 items allowed
+      }
+
+      for (const batch of batches) {
+        let unprocessedItems: Record<string, {}>[] = batch.map<Record<string, {}>>(([user, passwordHash]) => ({
+          PutRequest: {
+            Item: {
+              [this.aliasAttr]: user.alias,
+              [this.firstNameAttr]: user.firstName,
+              [this.lastNameAttr]: user.lastName,
+              [this.imageUrlAttr]: user.imageUrl,
+              [this.passwordHashAttr]: passwordHash,
+              [this.numFollowersAttr]: 0,
+              [this.numFolloweesAttr]: 0
+            },
+          }
+        }));
+
+        while (unprocessedItems.length > 0) {
+          const params: BatchWriteCommandInput = {
+            RequestItems: {
+              [this.tableName]: unprocessedItems
+            },
+          };
+
+          const result = await this.client.send(new BatchWriteCommand(params));
+
+          unprocessedItems = result.UnprocessedItems?.[this.tableName] || [];
+        }
+      }
+    },
+      "DynamoDBUserDao",
+      "bulkCreateUsers"
     );
   }
 
