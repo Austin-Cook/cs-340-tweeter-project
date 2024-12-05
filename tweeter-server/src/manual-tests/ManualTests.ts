@@ -1,13 +1,13 @@
 import { AuthToken, AuthTokenDto, StatusDto, UserDto } from "tweeter-shared"
-import { DynamoDBFollowDao } from "./model/dao/dynamodb-dao/DynamoDBFollowDao"
-import { DynamoDBStatusDao } from "./model/dao/dynamodb-dao/DynamoDBStatusDao";
-import { DynamoDBAuthDao } from "./model/dao/dynamodb-dao/DynamoDBAuthDao";
-import { DynamoDBUserDao } from "./model/dao/dynamodb-dao/DynamoDBUserDao";
-import { AuthService } from "./model/service/AuthService";
-import { DynamoDBS3DaoFactory } from "./model/dao/factory/DynamoDBS3DaoFactory";
-import { FollowService } from "./model/service/FollowService";
-import { StatusService } from "./model/service/StatusService";
-import { UserService } from "./model/service/UserService";
+import { DynamoDBFollowDao } from "../model/dao/dynamodb-dao/DynamoDBFollowDao"
+import { DynamoDBStatusDao } from "../model/dao/dynamodb-dao/DynamoDBStatusDao";
+import { DynamoDBAuthDao } from "../model/dao/dynamodb-dao/DynamoDBAuthDao";
+import { DynamoDBUserDao } from "../model/dao/dynamodb-dao/DynamoDBUserDao";
+import { AuthService } from "../model/service/AuthService";
+import { DynamoDBS3DaoFactory } from "../model/dao/factory/DynamoDBS3DaoFactory";
+import { FollowService } from "../model/service/FollowService";
+import { StatusService } from "../model/service/StatusService";
+import { UserService } from "../model/service/UserService";
 
 const main = async () => {
   // const user: UserDto = {
@@ -395,6 +395,9 @@ const main = async () => {
   // }
 
   // console.log(authService.isTimestampActive(1731950775));
+
+
+  // console.log(await followDao.getGroupOfAliases("@user0", "@user1014"));
 }
 
 main()
