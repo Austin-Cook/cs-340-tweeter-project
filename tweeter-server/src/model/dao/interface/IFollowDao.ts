@@ -7,4 +7,6 @@ export interface IFollowDao {
   createFollow: (follower: UserDto, followee: UserDto) => Promise<void>;
   removeFollow: (followerAlias: string, followeeAlias: string) => Promise<void>;
   isFollower: (followerAlias: string, followeeAlias: string) => Promise<boolean>;
+  bulkFollow: (followers: UserDto[], followee: UserDto) => Promise<void>;
+  getGroupOfAliases: (alias: string, lastFollowerAlias: string | undefined) => Promise<[string[], boolean]>;
 }

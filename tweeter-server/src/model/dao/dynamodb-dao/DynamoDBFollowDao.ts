@@ -1,4 +1,6 @@
 import {
+  BatchWriteCommand,
+  BatchWriteCommandInput,
   DeleteCommand,
   DynamoDBDocumentClient,
   GetCommand,
@@ -177,6 +179,43 @@ export class DynamoDBFollowDao implements IFollowDao {
     );
   }
 
+  public async getGroupOfAliases(alias: string, lastFollowerAlias: string | undefined): Promise<[string[], boolean]> {
+    return await doFailureReportingOperation(async () => {
+      const aliases: string[] = [];
+
+      const params = {
+        KeyConditionExpression: this.followeeHandleAttr + " = :followee",
+        ExpressionAttributeValues: {
+          ":followee": alias,
+        },
+        TableName: this.tableName,
+        IndexName: this.indexName,
+        Limit: 500,
+        ExclusiveStartKey:
+          lastFollowerAlias === undefined
+            ? undefined
+            : {
+              [this.followerHandleAttr]: lastFollowerAlias,
+              [this.followeeHandleAttr]: alias,
+            },
+        ProjectionExpression: '#followerHandleAttr',
+        ExpressionAttributeNames: {
+          '#followerHandleAttr': this.followerHandleAttr,
+        }
+      };
+
+      const data = await this.client.send(new QueryCommand(params));
+      data.Items?.forEach((item) =>
+        aliases.push(item[this.followerHandleAttr]));
+      const hasMorePages = data.LastEvaluatedKey !== undefined;
+
+      return [aliases, hasMorePages];
+    },
+      "DynamoDBFollowDao",
+      "getGroupOfAliases"
+    );
+  }
+
   public async createFollow(follower: UserDto, followee: UserDto): Promise<void> {
     await doFailureReportingOperation(async () => {
       const params = {
@@ -233,6 +272,59 @@ export class DynamoDBFollowDao implements IFollowDao {
     },
       "DynamoDBFollowDao",
       "isFollower"
+    );
+  }
+
+  /**
+   * Used for testing
+   */
+  public async bulkFollow(followers: UserDto[], followee: UserDto): Promise<void> {
+    await doFailureReportingOperation(async () => {
+      if (!followers || followers.length == 0) {
+        // no users to add
+        return;
+      }
+
+      const batchSize = 25;
+
+      const batches: UserDto[][] = []
+      while (followers.length > 0) {
+        const batch = followers.splice(0, batchSize);
+
+        batches.push(batch); // Max 25 items allowed
+      }
+
+      for (const batch of batches) {
+        let unprocessedItems: Record<string, {}>[] = batch.map<Record<string, {}>>((follower) => ({
+          PutRequest: {
+            Item: {
+              [this.followerHandleAttr]: follower.alias,
+              [this.followeeHandleAttr]: followee.alias,
+              [this.followerFirstNameAttr]: follower.firstName,
+              [this.followeeFirstNameAttr]: followee.firstName,
+              [this.followerLastNameAttr]: follower.lastName,
+              [this.followeeLastNameAttr]: followee.lastName,
+              [this.followerImageUrlAttr]: follower.imageUrl,
+              [this.followeeImageUrlAttr]: followee.imageUrl,
+            },
+          }
+        }));
+
+        while (unprocessedItems.length > 0) {
+          const params: BatchWriteCommandInput = {
+            RequestItems: {
+              [this.tableName]: unprocessedItems
+            },
+          };
+
+          const result = await this.client.send(new BatchWriteCommand(params));
+
+          unprocessedItems = result.UnprocessedItems?.[this.tableName] || [];
+        }
+      }
+    },
+      "DynamoDBUserDao",
+      "bulkFollow"
     );
   }
 

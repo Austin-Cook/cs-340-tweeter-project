@@ -143,11 +143,6 @@ export class DynamoDBStatusDao implements IStatusDao {
               [this.lastNameAttr]: status.user.lastName,
               [this.imageUrlAttr]: status.user.imageUrl
             },
-            ConditionExpression: `attribute_not_exists(#followerAliasAttr) AND attribute_not_exists(#timestampAliasAttr)`,
-            ExpressionAttributeNames: {
-              '#followerAliasAttr': this.followerAliasAttr,
-              '#timestampAliasAttr': this.timestampAliasAttr,
-            },
           }
         }));
 
@@ -166,7 +161,7 @@ export class DynamoDBStatusDao implements IStatusDao {
     },
       "DynamoDBStatusDao",
       "addStatusesToUsersFeed"
-    )
+    );
   }
 
   private loadPagedStatusItems = async (params: QueryCommandInput, daoMethod: string) => {
