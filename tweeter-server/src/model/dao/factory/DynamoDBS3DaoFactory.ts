@@ -2,11 +2,6 @@ import { DynamoDBAuthDao } from "../dynamodb-dao/DynamoDBAuthDao";
 import { DynamoDBFollowDao } from "../dynamodb-dao/DynamoDBFollowDao";
 import { DynamoDBStatusDao } from "../dynamodb-dao/DynamoDBStatusDao";
 import { DynamoDBUserDao } from "../dynamodb-dao/DynamoDBUserDao";
-import { IAuthDao } from "../interface/IAuthDao";
-import { IFollowDao } from "../interface/IFollowDao";
-import { IImageDao } from "../interface/IImageDao";
-import { IStatusDao } from "../interface/IStatusDao";
-import { IUserDao } from "../interface/IUserDao";
 import { S3ImageDao } from "../s3-dao/S3ImageDao";
 import { IDaoFactory } from "./IDaoFactory";
 
@@ -21,23 +16,23 @@ export class DynamoDBS3DaoFactory implements IDaoFactory {
     return this._instance;
   }
 
-  public createAuthDao(): IAuthDao {
+  public createAuthDao(): DynamoDBAuthDao {
     return new DynamoDBAuthDao();
   }
 
-  public createFollowDao(): IFollowDao {
+  public createFollowDao(): DynamoDBFollowDao {
     return new DynamoDBFollowDao();
   }
 
-  public createStatusDao(): IStatusDao {
+  public createStatusDao(): DynamoDBStatusDao {
     return new DynamoDBStatusDao();
   }
 
-  public createUserDao(): IUserDao {
+  public createUserDao(): DynamoDBUserDao {
     return new DynamoDBUserDao();
   }
 
-  public createImageDao(): IImageDao {
+  public createImageDao(): S3ImageDao {
     return new S3ImageDao();
   }
 }
