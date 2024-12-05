@@ -9,4 +9,5 @@ export interface IUserDao {
   incrementNumFollowers: (alias: string) => Promise<void>;
   decrementNumFollowees: (alias: string) => Promise<void>;
   decrementNumFollowers: (alias: string) => Promise<void>;
+  bulkCreateUsers: (users: UserDto[], passwordHashes: string[]) => Promise<void>;
 }

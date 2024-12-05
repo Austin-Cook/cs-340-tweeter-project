@@ -21,23 +21,23 @@ export class DynamoDBS3DaoFactory implements IDaoFactory {
     return this._instance;
   }
 
-  public createAuthDao(): IAuthDao {
+  public createAuthDao(): DynamoDBAuthDao {
     return new DynamoDBAuthDao();
   }
 
-  public createFollowDao(): IFollowDao {
+  public createFollowDao(): DynamoDBFollowDao {
     return new DynamoDBFollowDao();
   }
 
-  public createStatusDao(): IStatusDao {
+  public createStatusDao(): DynamoDBStatusDao {
     return new DynamoDBStatusDao();
   }
 
-  public createUserDao(): IUserDao {
+  public createUserDao(): DynamoDBUserDao {
     return new DynamoDBUserDao();
   }
 
-  public createImageDao(): IImageDao {
+  public createImageDao(): S3ImageDao {
     return new S3ImageDao();
   }
 }
